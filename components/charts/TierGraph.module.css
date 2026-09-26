@@ -1,0 +1,98 @@
+.frame {
+  position: relative;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  touch-action: pan-y;
+}
+
+.grid {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.tick {
+  font-family: var(--font-num);
+  font-size: 12.5px;
+  font-weight: 500;
+  fill: var(--text-3);
+}
+
+.band {
+  font-size: 12px;
+  font-weight: 600;
+  fill: var(--text-2);
+}
+
+.deal {
+  fill: #7d89a3;
+  opacity: 0.45;
+}
+
+.line {
+  fill: none;
+  stroke: #eef2fa;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.now {
+  fill: #eef2fa;
+  stroke: var(--panel);
+  stroke-width: 2;
+}
+
+.cross {
+  stroke: var(--text-3);
+  stroke-width: 1;
+}
+
+.hoverDot {
+  fill: #eef2fa;
+  stroke: var(--panel);
+  stroke-width: 2;
+}
+
+.tip {
+  position: absolute;
+  top: 8px;
+  display: grid;
+  gap: 1px;
+  min-width: 128px;
+  padding: 8px 10px;
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+  background: rgba(15, 20, 32, 0.96);
+  font-size: 12.5px;
+  color: var(--text-2);
+  pointer-events: none;
+}
+
+.tip b {
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.tipTier {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text);
+}
+
+.tipTier i {
+  width: 10px;
+  height: 3px;
+  border-radius: 2px;
+}
+
+.none {
+  padding: 40px 0;
+  text-align: center;
+  color: var(--text-3);
+}

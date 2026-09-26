@@ -1,0 +1,28 @@
+.spark {
+  display: block;
+  overflow: visible;
+}
+
+.line {
+  fill: none;
+  stroke: #5a6680;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.up {
+  fill: var(--up);
+}
+
+.down {
+  fill: var(--down);
+}
+
+.flat {
+  fill: var(--text-3);
+}
+
+.none {
+  color: var(--text-3);
+}

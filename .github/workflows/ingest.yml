@@ -1,0 +1,51 @@
+# Collect MOLIT apartment trades and print the day's edition.
+# Runs twice a day; "Run workflow" with from/to backfills a range.
+name: ingest
+
+on:
+  schedule:
+    - cron: "10 21 * * *" # 06:10 KST
+    - cron: "10 4 * * *" # 13:10 KST
+  workflow_dispatch:
+    inputs:
+      from:
+        description: "Backfill from YYYYMM (leave empty for the daily run)"
+        required: false
+      to:
+        description: "Backfill to YYYYMM (defaults to this month)"
+        required: false
+
+concurrency:
+  group: ingest
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Apply migrations
+        run: npx prisma migrate deploy
+        env:
+          DATABASE_URL_UNPOOLED: ${{ secrets.DATABASE_URL_UNPOOLED }}
+
+      - name: Ingest
+        run: |
+          ARGS=""
+          if [ -n "${{ inputs.from }}" ]; then ARGS="$ARGS --from ${{ inputs.from }}"; fi
+          if [ -n "${{ inputs.to }}" ]; then ARGS="$ARGS --to ${{ inputs.to }}"; fi
+          npm run ingest -- $ARGS
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          MOLIT_SERVICE_KEY: ${{ secrets.MOLIT_SERVICE_KEY }}
+          REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET }}
+          SITE_URL: ${{ vars.SITE_URL }}

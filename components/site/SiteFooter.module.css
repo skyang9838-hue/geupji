@@ -1,0 +1,57 @@
+.footer {
+  margin-top: 96px;
+  padding: 36px 0 48px;
+  border-top: 1px solid var(--line);
+  background: var(--night-2);
+  color: var(--text-3);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 40px;
+}
+
+.about p + p,
+.notes p + p {
+  margin-top: 8px;
+}
+
+.name {
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-2);
+}
+
+.name span {
+  font-family: var(--font-num);
+  font-weight: 600;
+  color: var(--text-3);
+}
+
+.links {
+  display: flex;
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.links a {
+  color: var(--text-2);
+  text-decoration: underline;
+  text-decoration-color: var(--line-2);
+  text-underline-offset: 3px;
+}
+
+.links a:hover {
+  color: var(--text);
+}
+
+@media (max-width: 720px) {
+  .inner {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}

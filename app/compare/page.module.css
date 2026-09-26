@@ -1,0 +1,321 @@
+.head {
+  padding: 40px 0 18px;
+}
+
+.head h1 {
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 850;
+  letter-spacing: -0.03em;
+}
+
+.head p {
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--text-2);
+}
+
+.loading {
+  padding: 80px 0;
+  text-align: center;
+  color: var(--text-3);
+}
+
+/* ── the matchup card ───────────────────────────────────────── */
+
+.versus {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 20px;
+  padding: 22px 24px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--panel);
+}
+
+.side {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.sideRight {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+
+.sideCrest {
+  flex: none;
+  filter: drop-shadow(0 8px 22px color-mix(in srgb, var(--c) 40%, transparent));
+}
+
+.side > div {
+  min-width: 0;
+  padding-bottom: 2px;
+  border-bottom: 3px solid var(--s);
+}
+
+.sideArea {
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.sideName {
+  overflow: hidden;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.sideTier {
+  font-size: 13.5px;
+  color: var(--text-2);
+}
+
+.sidePrice {
+  font-size: 15px;
+  color: var(--text-2);
+}
+
+.sidePrice :global(.num) {
+  margin-right: 1px;
+  font-size: 34px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.vs {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  max-width: 260px;
+  text-align: center;
+}
+
+.vsMark {
+  font-family: var(--font-num);
+  font-size: 44px;
+  font-weight: 700;
+  font-style: italic;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--text-3);
+}
+
+.gap {
+  display: grid;
+  gap: 2px;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.gap b {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ── cards ──────────────────────────────────────────────────── */
+
+.card {
+  margin-top: 16px;
+  padding: 18px 20px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+}
+
+.cardHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+}
+
+.cardHead h2,
+.pickerTitle {
+  font-size: 16px;
+  font-weight: 750;
+}
+
+.cardHead p {
+  font-size: 12.5px;
+  color: var(--text-3);
+}
+
+.legend {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin: 10px 0 4px;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend i {
+  display: inline-block;
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+}
+
+.table {
+  width: 100%;
+  font-size: 14px;
+}
+
+.table th {
+  padding: 6px 8px 10px;
+  border-bottom: 1px solid var(--line);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-align: left;
+}
+
+.table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.table tr:last-child td {
+  border-bottom: 0;
+}
+
+.right {
+  text-align: right !important;
+}
+
+.swatch {
+  display: inline-block;
+  width: 12px;
+  height: 3px;
+  margin-right: 8px;
+  border-radius: 2px;
+  vertical-align: middle;
+}
+
+.name {
+  font-weight: 650;
+}
+
+.name:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.area {
+  margin-left: 8px;
+  font-size: 12.5px;
+  color: var(--text-3);
+}
+
+.tier {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.big {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.pickRow {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+
+.pickRow:first-of-type {
+  margin-top: 10px;
+}
+
+.pickTier {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-top: 5px;
+  font-size: 13.5px;
+  font-weight: 650;
+  color: var(--text-2);
+}
+
+.pickRow ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pick {
+  display: inline-block;
+  padding: 5px 12px;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  font-size: 13.5px;
+  color: var(--text-2);
+  transition: border-color 120ms ease, background-color 120ms ease;
+}
+
+.pick:hover {
+  border-color: color-mix(in srgb, var(--c) 60%, var(--line-2));
+  color: var(--text);
+}
+
+.on {
+  border-color: var(--s);
+  background: color-mix(in srgb, var(--s) 22%, transparent);
+  color: var(--text);
+  font-weight: 650;
+}
+
+@media (max-width: 860px) {
+  .versus {
+    grid-template-columns: 1fr;
+  }
+  .sideRight {
+    flex-direction: row;
+    text-align: left;
+  }
+  .vs {
+    justify-items: start;
+    max-width: none;
+    text-align: left;
+  }
+  .vsMark {
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 720px) {
+  .pickRow {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .table th:nth-child(4),
+  .table td:nth-child(4),
+  .table th:nth-child(5),
+  .table td:nth-child(5) {
+    display: none;
+  }
+  .area {
+    display: block;
+    margin-left: 20px;
+  }
+}

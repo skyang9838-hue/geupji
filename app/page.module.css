@@ -1,0 +1,93 @@
+.hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 40px 0 22px;
+}
+
+.title {
+  font-size: clamp(30px, 4vw, 44px);
+  font-weight: 850;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+}
+
+.lede {
+  margin-top: 10px;
+  font-size: 15px;
+  color: var(--text-2);
+}
+
+.cutoffs {
+  display: flex;
+  gap: 10px;
+  flex: none;
+}
+
+.cutoff {
+  min-width: 176px;
+  padding: 10px 14px 11px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+}
+
+.cutoff dt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.cutoff dd {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.cutoff dd :global(.num) {
+  margin-right: 1px;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.cutoff small {
+  display: block;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.section {
+  margin-top: 56px;
+}
+
+.empty {
+  padding: 120px 0;
+  text-align: center;
+}
+
+.empty h1 {
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.empty p {
+  margin-top: 10px;
+  color: var(--text-2);
+}
+
+@media (max-width: 860px) {
+  .hero {
+    flex-direction: column;
+    align-items: stretch;
+    padding-top: 28px;
+  }
+  .cutoff {
+    flex: 1;
+    min-width: 0;
+  }
+}

@@ -1,0 +1,116 @@
+.page {
+  max-width: calc(880px + var(--gutter) * 2);
+}
+
+.head {
+  padding: 44px 0 8px;
+}
+
+.head h1 {
+  font-size: clamp(30px, 4vw, 40px);
+  font-weight: 850;
+  letter-spacing: -0.03em;
+}
+
+.head p {
+  margin-top: 12px;
+  max-width: 40em;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--text-2);
+}
+
+.section {
+  margin-top: 44px;
+}
+
+.section h2 {
+  margin-bottom: 14px;
+  font-size: 20px;
+  font-weight: 750;
+}
+
+.ladder {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.ladder li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px 8px 10px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--c);
+  border-radius: 10px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--c) 10%, transparent), transparent 60%), var(--panel);
+}
+
+.tierName {
+  font-size: 16px;
+  font-weight: 750;
+}
+
+.tierRule {
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.count {
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.count :global(.num) {
+  margin-right: 1px;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.rules {
+  display: grid;
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--line);
+}
+
+.rules div {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--panel);
+}
+
+.rules dt {
+  font-weight: 700;
+}
+
+.rules dd {
+  line-height: 1.7;
+  color: var(--text-2);
+}
+
+.notes {
+  display: grid;
+  gap: 8px;
+  padding-left: 18px;
+  line-height: 1.7;
+  color: var(--text-2);
+}
+
+@media (max-width: 720px) {
+  .ladder {
+    grid-template-columns: 1fr;
+  }
+  .rules div {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}

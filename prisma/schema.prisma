@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// 단지. 국토부 단지 일련번호(aptSeq)가 키다.
+model Complex {
+  aptSeq    String   @id
+  name      String
+  /// 마지막으로 받아온 시군구 코드 (분구·개편 뒤에는 새 코드로 바뀐다)
+  sggCd     String
+  /// 마지막으로 받아온 법정동 이름 (예: 오산동 → 여울동)
+  umdName   String
+  jibun     String?
+  roadName  String?
+  buildYear Int?
+  /// 2단계(3D 지도)용 좌표
+  lat       Float?
+  lng       Float?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  trades    Trade[]
+
+  @@index([umdName])
+}
+
+/// 실거래 한 건. 국토부에는 거래 ID가 없어 (sourceKey, occurrence)로 식별한다.
+model Trade {
+  id           Int       @id @default(autoincrement())
+  sourceKey    String
+  occurrence   Int
+  aptSeq       String
+  complex      Complex   @relation(fields: [aptSeq], references: [aptSeq])
+  /// 마지막으로 이 거래를 돌려준 조회 코드
+  sggCd        String
+  /// 계약 연월 YYYYMM (조회 단위)
+  dealYm       String
+  dealDate     DateTime  @db.Date
+  areaM2       Float
+  floor        Int
+  priceManwon  Int
+  dealingType  String?
+  buyerType    String?
+  sellerType   String?
+  cancelled    Boolean   @default(false)
+  cancelledOn  DateTime? @db.Date
+  registeredOn DateTime? @db.Date
+  aptDong      String?
+  firstSeenAt  DateTime  @default(now())
+  /// 원천에서 사라진 거래(정정·삭제). 다시 나타나면 null로 되돌린다.
+  removedAt    DateTime?
+
+  @@unique([sourceKey, occurrence])
+  @@index([aptSeq, dealDate])
+  @@index([sggCd, dealYm])
+}
+
+/// 판(版). 하루에 한 판. 같은 날 다시 수집하면 그 판의 순위를 다시 매긴다.
+model Edition {
+  id          Int      @id @default(autoincrement())
+  number      Int      @unique
+  /// 데이터 기준일 (KST 날짜)
+  asOf        DateTime @unique @db.Date
+  publishedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  /// RegionSnapshot[] (순위·티어·월별 래더·시즌 포함)
+  snapshots   Json
+  /// EditionEvent[]
+  events      Json
+}
+
+model IngestRun {
+  id         Int       @id @default(autoincrement())
+  /// daily | backfill
+  kind       String
+  /// running | ok | partial | failed
+  status     String
+  startedAt  DateTime  @default(now())
+  finishedAt DateTime?
+  requests   Int       @default(0)
+  fetched    Int       @default(0)
+  inserted   Int       @default(0)
+  updated    Int       @default(0)
+  removed    Int       @default(0)
+  failures   Json?
+}
+
+/// 실패한 (코드, 월). 다음 수집 때 다시 받는다.
+model PendingFetch {
+  code      String
+  ym        String
+  attempts  Int      @default(0)
+  lastError String?
+  updatedAt DateTime @updatedAt
+
+  @@id([code, ym])
+}

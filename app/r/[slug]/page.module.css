@@ -1,0 +1,363 @@
+.profile {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 28px;
+  margin-top: 28px;
+  padding: 26px 32px 26px 22px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background:
+    radial-gradient(60% 140% at 0% 50%, color-mix(in srgb, var(--c) 16%, transparent), transparent 70%),
+    var(--panel);
+}
+
+.crest {
+  filter: drop-shadow(0 10px 26px color-mix(in srgb, var(--c) 40%, transparent));
+}
+
+.crumbs {
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.crumbs a:hover {
+  color: var(--text);
+}
+
+.name {
+  margin-top: 4px;
+  font-size: clamp(26px, 3.4vw, 38px);
+  font-weight: 850;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.meta {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--text-2);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.rankChip,
+.tierChip {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.rankChip {
+  background: var(--panel-3);
+  color: var(--text-2);
+}
+
+.rankChip :global(.num) {
+  font-size: 15px;
+  color: var(--text);
+}
+
+.tierChip {
+  background: color-mix(in srgb, var(--c) 20%, transparent);
+  color: var(--text);
+}
+
+.figure {
+  text-align: right;
+}
+
+.figureLabel {
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.figureValue {
+  font-size: 18px;
+  color: var(--text-2);
+}
+
+.figureValue :global(.num) {
+  margin-right: 2px;
+  font-size: 56px;
+  font-weight: 600;
+  line-height: 1.05;
+  font-variant-numeric: proportional-nums;
+  color: var(--text);
+}
+
+.figureNote {
+  font-size: 12.5px;
+  color: var(--text-3);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 340px minmax(0, 1fr);
+  align-items: start;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.side,
+.mainCol {
+  display: grid;
+  gap: 16px;
+}
+
+.card {
+  padding: 18px 20px 20px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+}
+
+.cardHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  margin-bottom: 12px;
+}
+
+.cardHead p {
+  font-size: 12.5px;
+  color: var(--text-3);
+}
+
+.cardTitle {
+  font-size: 16px;
+  font-weight: 750;
+}
+
+.cardTitle span {
+  margin-left: 6px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-3);
+}
+
+.rankRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.rankTier {
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.rankLp {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.lpBar {
+  height: 6px;
+  margin-top: 14px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--panel-3);
+}
+
+.lpBar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--c);
+}
+
+.climb {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 16px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.stats dt {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.stats dd {
+  margin-top: 2px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.seasons {
+  width: 100%;
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+.seasons th,
+.seasons td {
+  padding: 7px 0;
+  border-top: 1px solid var(--line);
+  text-align: left;
+  font-weight: 500;
+}
+
+.seasons tr:first-child th,
+.seasons tr:first-child td {
+  border-top: 0;
+}
+
+.seasons th :global(.num) {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.live {
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 4px;
+  background: var(--panel-3);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.seasonTier {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 650;
+}
+
+.right {
+  text-align: right !important;
+}
+
+.neighbors {
+  list-style: none;
+  display: grid;
+  gap: 4px;
+  margin-top: 10px;
+}
+
+.neighbors a {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: baseline;
+  padding: 7px 8px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.neighbors a:hover {
+  background: var(--panel-2);
+}
+
+.neighbors b {
+  overflow: hidden;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.nRank {
+  color: var(--text-3);
+  text-align: right;
+}
+
+.trades {
+  width: 100%;
+  font-size: 14px;
+}
+
+.trades th {
+  padding: 8px 6px;
+  border-bottom: 1px solid var(--line);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-align: left;
+}
+
+.trades td {
+  padding: 8px 6px;
+  border-bottom: 1px solid var(--line);
+}
+
+.trades tr:last-child td {
+  border-bottom: 0;
+}
+
+.cancelled td {
+  color: var(--text-3);
+}
+
+.note {
+  font-size: 12.5px;
+  color: var(--text-3);
+}
+
+.missing {
+  padding: 120px 0;
+  text-align: center;
+}
+
+.missing h1 {
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.missing p {
+  margin-top: 10px;
+  color: var(--text-2);
+}
+
+@media (max-width: 960px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .side {
+    order: 2;
+  }
+}
+
+@media (max-width: 720px) {
+  .profile {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 14px 16px;
+    padding: 18px 16px;
+  }
+  .crest {
+    width: 84px;
+    height: 84px;
+  }
+  .figure {
+    grid-column: 1 / -1;
+    text-align: left;
+  }
+  .figureValue :global(.num) {
+    font-size: 44px;
+  }
+  .card {
+    padding: 16px 14px;
+  }
+}

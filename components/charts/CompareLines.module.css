@@ -1,0 +1,109 @@
+.frame {
+  position: relative;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  touch-action: pan-y;
+}
+
+.grid {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.tick {
+  font-family: var(--font-num);
+  font-size: 12.5px;
+  font-weight: 500;
+  fill: var(--text-3);
+}
+
+.band {
+  font-size: 11.5px;
+  font-weight: 600;
+  fill: var(--text-3);
+}
+
+.line {
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.endName {
+  font-size: 13px;
+  font-weight: 650;
+  fill: var(--text);
+}
+
+.endValue {
+  font-family: var(--font-num);
+  font-size: 13px;
+  font-weight: 500;
+  fill: var(--text-2);
+}
+
+.cross {
+  stroke: var(--text-3);
+  stroke-width: 1;
+}
+
+.hoverDot {
+  stroke: var(--panel);
+  stroke-width: 2;
+}
+
+.tip {
+  position: absolute;
+  top: 8px;
+  display: grid;
+  gap: 3px;
+  min-width: 170px;
+  padding: 8px 10px;
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+  background: rgba(15, 20, 32, 0.96);
+  font-size: 12.5px;
+  color: var(--text-2);
+  pointer-events: none;
+}
+
+.tipDate {
+  margin-bottom: 2px;
+  color: var(--text-3);
+}
+
+.tipRow {
+  display: grid;
+  grid-template-columns: 12px auto minmax(0, 1fr);
+  align-items: center;
+  gap: 7px;
+}
+
+.tipRow i {
+  width: 12px;
+  height: 3px;
+  border-radius: 2px;
+}
+
+.tipRow b {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.tipRow span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.none {
+  padding: 40px 0;
+  text-align: center;
+  color: var(--text-3);
+}
