@@ -1,10 +1,10 @@
 import type { CSSProperties } from "react";
 import { curveBumpX, line } from "d3-shape";
 import type { RegionDef } from "@/data/regions";
+import { sampleSpan, SpanPicker, type Span } from "@/components/span/SpanPicker";
 import type { RegionSnapshot } from "@/lib/stats/snapshot";
 import styles from "./RankFlow.module.css";
 
-const MONTHS = 12;
 
 interface Series {
   slug: string;
@@ -15,15 +15,24 @@ interface Series {
 }
 
 /**
- * Bump chart of month-end ranks over the last year. Every line is quiet; the
- * biggest climber and faller are lit, and pointing at any line lights it alone.
+ * Bump chart of month-end ranks over a picked span (1, 12 or 20 years). Every
+ * line is quiet; the biggest climber and faller are lit, and pointing at any
+ * line lights it alone. The span buttons are radios, so it needs no script.
  */
 export function RankFlow({ snapshots, regions }: { snapshots: RegionSnapshot[]; regions: RegionDef[] }) {
+  return (
+    <figure className={styles.figure}>
+      <SpanPicker name="rankflow">{(span) => <Flow snapshots={snapshots} regions={regions} span={span} />}</SpanPicker>
+    </figure>
+  );
+}
+
+function Flow({ snapshots, regions, span }: { snapshots: RegionSnapshot[]; regions: RegionDef[]; span: Span }) {
   const bySlug = new Map(regions.map((r) => [r.slug, r]));
   const series: Series[] = snapshots
     .filter((s) => s.standing)
     .map((s) => {
-      const ranks = s.ladder.slice(-MONTHS).map((p) => p.rank);
+      const ranks = sampleSpan(s.ladder, span).map((p) => p.rank);
       const first = ranks.find((r) => r !== null) ?? null;
       const last = ranks.at(-1) ?? null;
       return {
@@ -36,7 +45,8 @@ export function RankFlow({ snapshots, regions }: { snapshots: RegionSnapshot[]; 
     })
     .sort((a, b) => (a.ranks.at(-1) ?? 99) - (b.ranks.at(-1) ?? 99));
 
-  const months = snapshots.find((s) => s.ladder.length)?.ladder.slice(-MONTHS).map((p) => p.ym) ?? [];
+  const ladder = snapshots.find((s) => s.ladder.length)?.ladder ?? [];
+  const months = sampleSpan(ladder, span).map((p) => p.ym);
   if (!series.length || months.length < 2) return null;
 
   const climber = maxBy(series, (s) => s.move ?? -Infinity);
@@ -51,14 +61,16 @@ export function RankFlow({ snapshots, regions }: { snapshots: RegionSnapshot[]; 
     .join(", ");
 
   return (
-    <figure className={styles.figure}>
+    <>
       {(["wide", "narrow"] as const).map((variant) => (
         <div key={variant} className={`${variant}-only`}>
-          <Plot variant={variant} series={series} months={months} lit={lit} />
+          <Plot variant={variant} series={series} months={months} lit={lit} span={span} />
         </div>
       ))}
-      <figcaption className="visually-hidden">최근 12개월 순위 변동이 큰 곳: {moves || "없음"}</figcaption>
-    </figure>
+      <p className="visually-hidden">
+        최근 {span.label} 순위 변동이 큰 곳: {moves || "없음"}
+      </p>
+    </>
   );
 }
 
@@ -67,17 +79,19 @@ function Plot({
   series,
   months,
   lit,
+  span,
 }: {
   variant: "wide" | "narrow";
   series: Series[];
   months: string[];
   lit: Set<string>;
+  span: Span;
 }) {
   const wide = variant === "wide";
   const rows = Math.max(...series.flatMap((s) => s.ranks.map((r) => r ?? 0)));
-  const M = wide ? { top: 14, right: 150, bottom: 34, left: 110 } : { top: 12, right: 92, bottom: 30, left: 64 };
+  const M = wide ? { top: 14, right: 160, bottom: 36, left: 110 } : { top: 12, right: 104, bottom: 34, left: 70 };
   const W = wide ? 1200 : 380;
-  const rowH = wide ? 26 : 23;
+  const rowH = wide ? 28 : 26;
   const H = M.top + (rows - 1) * rowH + M.bottom;
   const plotW = W - M.left - M.right;
   const x = (i: number) => M.left + (i / (months.length - 1)) * plotW;
@@ -87,21 +101,22 @@ function Plot({
     .x(([i]) => x(i))
     .y(([, r]) => y(r!))
     .curve(curveBumpX);
-  const tickEvery = wide ? 1 : 3;
+  const yearly = span.step === 12;
+  const tickEvery = yearly ? (wide ? 2 : 5) : wide ? 1 : 3;
 
   return (
     <svg
       viewBox={`0 0 ${W} ${H}`}
       className={`${styles.svg} ${lit.size ? styles.hasLit : ""}`}
       role="img"
-      aria-label="최근 12개월 월말 순위 변동"
+      aria-label={`최근 ${span.label} 순위 변동`}
     >
       {months.map((ym, i) => (
         <g key={ym}>
           <line x1={x(i)} x2={x(i)} y1={M.top - 6} y2={H - M.bottom + 8} className={styles.grid} />
           {(months.length - 1 - i) % tickEvery === 0 && (
             <text x={x(i)} y={H - 10} textAnchor="middle" className={styles.month}>
-              {`${ym.slice(2, 4)}.${ym.slice(4)}`}
+              {yearly ? `'${ym.slice(2, 4)}` : `${ym.slice(2, 4)}.${ym.slice(4)}`}
             </text>
           )}
         </g>

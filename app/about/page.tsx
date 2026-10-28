@@ -12,8 +12,6 @@ export const metadata: Metadata = {
   description: "급지.gg가 대장아파트의 티어를 매기는 방법: 84㎡ 대표가, 티어 구간, 디비전과 LP, 출처.",
 };
 
-const EOK = 10000;
-
 export default async function AboutPage() {
   const edition = await getLatestEdition();
   const counts = new Map<string, number>();
@@ -38,7 +36,7 @@ export default async function AboutPage() {
           <ol className={styles.ladder}>
             {TIERS.map((tier) => (
               <li key={tier.id} style={{ "--c": `var(--t-${tier.id})` } as CSSProperties}>
-                <TierEmblem tier={tier.id} size={56} />
+                <TierEmblem tier={tier.id} size={64} />
                 <div>
                   <p className={styles.tierName}>{tier.name}</p>
                   <p className={styles.tierRule}>{rule(tier)}</p>
@@ -66,17 +64,25 @@ export default async function AboutPage() {
               <dd>해제된 거래, 국토교통부 자료에서 사라진 거래, 직거래는 대표가 계산에서 빼요. 직거래에는 가족 간 저가 거래가 섞여 있어서예요.</dd>
             </div>
             <div>
+              <dt>급지</dt>
+              <dd>
+                티어는 금액이 아니라 격차로 매겨요. 서울 상위 3곳 대장의 평균을 1.0급지로 두고, 대표가가 그보다 낮을수록
+                급지 숫자가 커져요 (급지 = 1 + 1.8 × ln(기준 ÷ 대표가)). 시장 전체가 같이 오르면 티어는 그대로이고, 격차가
+                좁혀지거나 벌어질 때만 승급·강등해요.
+              </dd>
+            </div>
+            <div>
               <dt>챌린저·그랜드마스터</dt>
               <dd>
-                롤처럼 자리가 정해져 있어요. 챌린저는 1위 한 자리(50억 이상일 때), 그랜드마스터는 그다음 두 자리(35억
-                이상일 때)예요. 값이 되어도 자리가 차 있으면 마스터에 머물러요.
+                롤처럼 자리가 정해져 있어요. 챌린저는 1위 한 자리, 그랜드마스터는 그다음 두 자리예요. 둘 다 1.7급지
+                이내일 때만 앉아요. 값이 되어도 자리가 차 있으면 마스터에 머물러요.
               </dd>
             </div>
             <div>
               <dt>디비전과 LP</dt>
               <dd>
-                아이언~다이아몬드는 가격 구간을 넷으로 나눠 IV → I 디비전을 매기고, 디비전 안에서 얼마나 올라왔는지를
-                0~99 LP로 보여줘요. 마스터 이상은 디비전이 없고, 30억을 넘는 100만 원마다 1 LP예요.
+                아이언~다이아몬드는 급지 구간을 넷으로 나눠 IV → I 디비전을 매기고, 디비전 안에서 얼마나 올라왔는지를
+                0~99 LP로 보여줘요. 마스터 이상은 디비전이 없고, 1.7급지 가격을 넘는 100만 원마다 1 LP예요.
               </dd>
             </div>
             <div>
@@ -109,11 +115,11 @@ export default async function AboutPage() {
 }
 
 function rule(tier: Tier): string {
-  const floor = tier.minManwon / EOK;
-  if (tier.id === "challenger") return `1위 한 자리 · ${floor}억 이상일 때`;
-  if (tier.id === "grandmaster") return `그다음 두 자리 · ${floor}억 이상일 때`;
-  if (tier.id === "master") return `${floor}억 이상 · 디비전 없음`;
-  const top = TIERS[tier.level - 1].minManwon / EOK;
-  if (tier.id === "iron") return `${top}억 미만 · IV~I`;
-  return `${floor}억 ~ ${top}억 · IV~I`;
+  const worst = tier.maxGeupji.toFixed(1);
+  if (tier.id === "challenger") return `1위 한 자리 · ${worst}급지 이내일 때`;
+  if (tier.id === "grandmaster") return `그다음 두 자리 · ${worst}급지 이내일 때`;
+  if (tier.id === "master") return `${worst}급지 이내 · 디비전 없음`;
+  const best = TIERS[tier.level - 1].maxGeupji.toFixed(1);
+  if (tier.id === "iron") return `${best}급지 넘음 · IV~I`;
+  return `${best} ~ ${worst}급지 · IV~I`;
 }

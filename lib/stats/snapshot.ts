@@ -35,6 +35,8 @@ export interface Contender {
 export interface HistoryPoint {
   ym: string;
   priceManwon: number | null;
+  /** The complex that led the region that month, when it was not today's leader. */
+  leaderName?: string;
 }
 
 /** What one region's trades say on their own, before it is ranked against the others. */
@@ -49,7 +51,7 @@ export interface RegionFacts {
   /** Best qualifying deal we hold for the leader. */
   high: PricePoint | null;
   contenders: Contender[];
-  /** Month by month since January 2021. */
+  /** Month by month since January 2006, each month priced by the leader of that month. */
   history: HistoryPoint[];
 }
 
@@ -73,7 +75,7 @@ export interface RegionSnapshot extends RegionFacts {
   seasons: SeasonRecord[];
 }
 
-const HISTORY_FROM = "202101";
+const HISTORY_FROM = "200601";
 const PEAK_FROM = "2021-01-01";
 const PEAK_TO = "2022-12-31";
 const CONTENDERS = 5;
@@ -127,7 +129,7 @@ export function buildRegionSnapshot(
       count: r.count,
       stale: r.stale,
     })),
-    history: priceHistory(leader.trades, asOf, band),
+    history: leaderHistory(complexes, configured ?? null, leader, asOf, band),
   };
 }
 
@@ -144,12 +146,38 @@ function canLeadOnItsOwn(complex: ComplexHistory, asOf: string, band: SizeBand):
   return deals.length >= AUTO_LEADER_MIN_DEALS;
 }
 
-/** The representative price at every month end from January 2021, the as-of day closing the last month. */
-function priceHistory(trades: StatTrade[], asOf: string, band = BASE_BAND): HistoryPoint[] {
+/**
+ * The region's price at every month end from January 2006, the as-of day closing
+ * the last month. Each month is priced by whoever led then: the configured
+ * leader once it trades, otherwise the same auto rule as today, judged at that
+ * month (younger than 30 then, three deals in the year before). Long-run 급지
+ * stays "the region's top complex", not one building's price before it existed.
+ */
+function leaderHistory(
+  complexes: ComplexHistory[],
+  configured: ComplexHistory | null,
+  today: ComplexHistory,
+  asOf: string,
+  band = BASE_BAND,
+): HistoryPoint[] {
   const endYm = asOf.slice(0, 4) + asOf.slice(5, 7);
+  const qualifying = complexes
+    .map((c) => ({ c, trades: c.trades.filter((t) => isQualifying(t, band)) }))
+    .filter((q) => q.trades.length > 0);
   return monthsBetween(HISTORY_FROM, endYm).map((ym) => {
     const day = ym === endYm ? asOf : monthEnd(ym);
-    return { ym, priceManwon: representativePrice(trades, day, band)?.priceManwon ?? null };
+    const since = shiftDate(day, -365);
+    const live = qualifying
+      .filter((q) => q.trades.some((t) => t.dealDate > since && t.dealDate <= day))
+      .map((q) => ({ c: q.c, rep: representativePrice(q.trades, day, band) }))
+      .filter((p): p is { c: ComplexHistory; rep: RepresentativePrice } => p.rep !== null && !p.rep.stale)
+      .sort((a, b) => b.rep.priceManwon - a.rep.priceManwon);
+    const lead =
+      live.find((p) => p.c === configured) ?? live.find((p) => canLeadOnItsOwn(p.c, day, band)) ?? live[0];
+    if (!lead) return { ym, priceManwon: null };
+    return lead.c === today
+      ? { ym, priceManwon: lead.rep.priceManwon }
+      : { ym, priceManwon: lead.rep.priceManwon, leaderName: lead.c.name };
   });
 }
 

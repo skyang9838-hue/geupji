@@ -14,16 +14,14 @@ export async function googleFont(family: string, weight: number, text: string): 
   return (await fetch(src)).arrayBuffer();
 }
 
-/** Korean in Noto Sans KR (the page's Pretendard is not on Google Fonts), figures in Barlow Condensed. */
+/** Noto Sans KR for everything (the page's Pretendard is not on Google Fonts); figures use the bold cut. */
 export async function cardFonts(bold: string, regular: string, figures: string) {
-  const [heavy, text, num] = await Promise.all([
-    googleFont("Noto Sans KR", 800, bold),
-    googleFont("Noto Sans KR", 500, regular),
-    googleFont("Barlow Condensed", 600, figures),
+  const [heavy, text] = await Promise.all([
+    googleFont("Noto Sans KR", 800, bold + figures),
+    googleFont("Noto Sans KR", 500, regular + figures),
   ]);
   return [
     { name: "Noto Sans KR", data: heavy, weight: 800 as const, style: "normal" as const },
     { name: "Noto Sans KR", data: text, weight: 500 as const, style: "normal" as const },
-    { name: "Barlow Condensed", data: num, weight: 600 as const, style: "normal" as const },
   ];
 }

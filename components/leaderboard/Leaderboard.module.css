@@ -1,20 +1,21 @@
+/* One flat tile, hairline rows, no header band. The tier color is a thin
+   mark at each row's edge; everything else is the neutral ladder. */
+
 .wrap {
   overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: var(--radius);
   background: var(--panel);
 }
 
 .table {
   width: 100%;
-  font-size: 14px;
+  font-size: 17px;
 }
 
 .table th {
-  padding: 11px 14px;
-  border-bottom: 1px solid var(--line);
-  background: var(--night-2);
-  font-size: 12.5px;
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid var(--panel-3);
+  font-size: 15px;
   font-weight: 600;
   color: var(--text-3);
   text-align: left;
@@ -22,8 +23,8 @@
 }
 
 .table td {
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--line);
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--panel-3);
   vertical-align: middle;
 }
 
@@ -49,26 +50,26 @@
 }
 
 .rankCol {
-  width: 64px;
+  width: 68px;
   text-align: center !important;
 }
 
 .rank {
   display: block;
-  font-size: 19px;
+  font-size: 22px;
   font-weight: 600;
 }
 
 .rankMove {
   display: block;
-  font-size: 12.5px;
-  line-height: 1.1;
+  font-size: 15px;
+  line-height: 1.2;
 }
 
 .name {
   display: block;
-  font-size: 15px;
-  font-weight: 650;
+  font-size: 18px;
+  font-weight: 600;
 }
 
 .name:hover {
@@ -78,40 +79,40 @@
 
 .area {
   display: block;
-  margin-top: 1px;
-  font-size: 12.5px;
+  margin-top: 2px;
+  font-size: 16px;
   color: var(--text-3);
 }
 
 .tier {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   white-space: nowrap;
 }
 
 .tierName {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-weight: 650;
+  gap: 8px;
+  font-weight: 600;
 }
 
 .lp {
   display: block;
-  font-size: 13px;
+  font-size: 16px;
   color: var(--text-3);
 }
 
 .price {
-  font-size: 13px;
+  font-size: 16px;
   color: var(--text-2);
   white-space: nowrap;
 }
 
 .price :global(.num) {
   margin-right: 1px;
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 600;
   color: var(--text);
 }
@@ -121,32 +122,30 @@
   justify-content: flex-end;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
+  font-size: 15px;
   color: var(--text-3);
   white-space: nowrap;
 }
 
+/* small pills: event names, never color alone */
 .badge {
-  padding: 0 6px;
-  border-radius: 4px;
-  font-size: 11.5px;
-  font-weight: 700;
-  line-height: 1.6;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.55;
+  white-space: nowrap;
 }
 
-.promo {
-  background: color-mix(in srgb, var(--up) 18%, transparent);
-  color: #ff8a8e;
+.promo,
+.high {
+  background: color-mix(in srgb, var(--up) 16%, transparent);
+  color: var(--up);
 }
 
 .demo {
-  background: color-mix(in srgb, var(--down) 20%, transparent);
-  color: #8db4ff;
-}
-
-.high {
-  background: color-mix(in srgb, var(--up) 18%, transparent);
-  color: #ff8a8e;
+  background: color-mix(in srgb, var(--down) 18%, transparent);
+  color: var(--down);
 }
 
 .date {
@@ -164,36 +163,97 @@
   }
 }
 
+/* Phone: each row becomes a small grid so the tier line can run the full
+   width under name and price — tier · geupji on the left, LP on the right. */
 @media (max-width: 560px) {
-  .table td,
-  .table th {
-    padding-inline: 8px;
+  /* the column names stay for screen readers; the row reads without them */
+  .table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .table tbody tr {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    column-gap: 10px;
+    row-gap: 2px;
+    align-items: baseline;
+    padding: 14px 14px 14px 8px;
+    border-bottom: 1px solid var(--panel-3);
+    box-shadow: inset 3px 0 0 var(--c);
+  }
+  .table tbody tr:last-child {
+    border-bottom: 0;
+  }
+  .table td {
+    padding: 0;
+    border-bottom: 0;
+  }
+  .table tbody td:first-child {
+    box-shadow: none;
   }
   .tierCol,
   .changeCol {
     display: none;
   }
-  .mTier {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 4px;
-    margin-top: 4px;
-    font-size: 12.5px;
-    font-weight: 600;
-    color: var(--text-2);
-  }
   .rankCol {
-    width: 44px;
+    width: auto;
+    grid-row: 1 / span 3;
+    align-self: center;
   }
-  .tier svg {
-    width: 26px;
-    height: 26px;
+  .nameCell,
+  .priceCell {
+    display: contents;
   }
   .name {
-    font-size: 14px;
+    grid-column: 2;
+    grid-row: 1;
+    overflow: hidden;
+    font-size: 18px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .area {
+    grid-column: 2;
+    grid-row: 2;
+    overflow: hidden;
+    margin-top: 0;
+    font-size: 15px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .price {
+    grid-column: 3;
+    grid-row: 1;
+    text-align: right;
   }
   .price :global(.num) {
-    font-size: 17px;
+    font-size: 22px;
+  }
+  .sub {
+    grid-column: 3;
+    grid-row: 2;
+  }
+  .mTier {
+    grid-column: 2 / -1;
+    grid-row: 3;
+    display: flex;
+    flex-wrap: wrap; /* only below ~370px with a badge: LP drops, still right-aligned */
+    align-items: center;
+    gap: 2px 6px;
+    margin-top: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-2);
+    white-space: nowrap;
+  }
+  .mTier svg {
+    flex: none;
+  }
+  .mLp {
+    margin-left: auto;
+    color: var(--text-3);
   }
 }

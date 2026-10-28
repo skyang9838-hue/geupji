@@ -118,15 +118,36 @@ describe("buildRegionSnapshot", () => {
     expect(snap.high).toEqual({ priceManwon: 310000, dealDate: "2026-09-20" });
   });
 
-  it("traces the leader's representative price at every month end since January 2021", () => {
+  it("traces the leader's representative price at every month end since January 2006", () => {
     const withWinter = complex("11710-1", "잠실엘스", [t("2025-12-10", 290000), t("2026-09-20", 310000), t("2026-09-01", 300000)]);
 
     const snap = buildRegionSnapshot(region, [withWinter], AS_OF);
 
-    expect(snap.history).toHaveLength(69);
-    expect(snap.history[0]).toEqual({ ym: "202101", priceManwon: null });
+    expect(snap.history).toHaveLength(249);
+    expect(snap.history[0]).toEqual({ ym: "200601", priceManwon: null });
     expect(snap.history.find((h) => h.ym === "202601")).toEqual({ ym: "202601", priceManwon: 290000 });
     expect(snap.history.at(-1)).toEqual({ ym: "202609", priceManwon: 305000 });
+  });
+
+  it("prices each past month by the leader of that month, naming it when it is not today's", () => {
+    const veteran = complex("11710-9", "옛대장", [t("2012-03-10", 90000), t("2012-05-10", 92000), t("2012-06-20", 94000)], 1995);
+    const today = complex("11710-1", "잠실엘스", [t("2026-09-20", 310000), t("2026-09-01", 300000), t("2026-08-01", 300000)]);
+
+    const snap = buildRegionSnapshot(region, [veteran, today], AS_OF);
+
+    expect(snap.history.find((h) => h.ym === "201206")).toEqual({ ym: "201206", priceManwon: 93000, leaderName: "옛대장" });
+    expect(snap.history.find((h) => h.ym === "201906")).toEqual({ ym: "201906", priceManwon: null });
+    expect(snap.history.at(-1)).toEqual({ ym: "202609", priceManwon: 300000 });
+  });
+
+  it("judges a past leader's age in its own year", () => {
+    // built 1990: 22 years old in 2012 (may lead), 36 in 2026 (may not)
+    const aging = complex("11710-8", "노후단지", [t("2012-04-01", 200000), t("2012-05-01", 200000), t("2012-06-01", 200000)], 1990);
+    const young = complex("11710-7", "새단지", [t("2012-04-01", 100000), t("2012-05-01", 100000), t("2012-06-01", 100000)], 2008);
+
+    const snap = buildRegionSnapshot(region, [aging, young], "2012-06-30");
+
+    expect(snap.history.at(-1)).toMatchObject({ priceManwon: 200000 });
   });
 
   it("leaves an empty region without a leader, price or history", () => {

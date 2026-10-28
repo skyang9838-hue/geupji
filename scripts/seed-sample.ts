@@ -51,7 +51,6 @@ const SAMPLE: SampleRegion[] = [
   { slug: "nowon", level: 95500, peak: 1.18, trend: 1.01, complexes: ["상계 센트럴하임", "중계 에듀파크", "하계 그린뷰"] },
   { slug: "cheongna", level: 91000, peak: 1.27, trend: 1.04, complexes: ["청라 호수센트럴", "청라 커낼하임", "청라 파크에비뉴"] },
   { slug: "ilsan", level: 85000, peak: 1.22, trend: 1.03, complexes: ["일산 호수파크", "마두 센트럴하임", "주엽 그린에비뉴"] },
-  { slug: "guwol", level: 79000, peak: 1.2, trend: 1.0, complexes: ["구월 센트럴시티", "간석 파크하임", "구월 에비뉴원"] },
   { slug: "geomdan", level: 61000, peak: 1.26, trend: 1.05, complexes: ["검단 호수하임", "검단 센트럴파크", "당하 리버뷰"] },
 ];
 

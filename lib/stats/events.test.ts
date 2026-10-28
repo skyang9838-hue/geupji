@@ -28,7 +28,14 @@ const snap = (regionSlug: string, priceManwon: number | null): RegionSnapshot =>
   high: null,
   contenders: [],
   history: [],
-  standing: priceManwon === null ? null : rankStandings([{ key: regionSlug, priceManwon }]).get(regionSlug)!,
+  // measured against a lone 50억 anchor: diamond from 27.1억, emerald from 23억
+  standing:
+    priceManwon === null
+      ? null
+      : rankStandings([
+          { key: "anchor", priceManwon: 500000, anchor: true },
+          { key: regionSlug, priceManwon },
+        ]).get(regionSlug)!,
   ladder: [],
   seasons: [],
 });
@@ -36,23 +43,23 @@ const snap = (regionSlug: string, priceManwon: number | null): RegionSnapshot =>
 const leader = { aptSeq: "11710-1", name: "잠실엘스" };
 
 describe("tierEvents", () => {
-  it("reports a promotion when the tier level falls (diamond → master)", () => {
-    const events = tierEvents(new Map([["jamsil", 3]]), [snap("jamsil", 305000)]);
+  it("reports a promotion when the tier level falls (emerald → diamond)", () => {
+    const events = tierEvents(new Map([["jamsil", 4]]), [snap("jamsil", 280000)]);
 
     expect(events).toEqual([
-      { type: "TIER_UP", regionSlug: "jamsil", fromLevel: 3, toLevel: 2, priceManwon: 305000 },
+      { type: "TIER_UP", regionSlug: "jamsil", fromLevel: 4, toLevel: 3, priceManwon: 280000 },
     ]);
   });
 
-  it("reports a demotion when the tier level rises (master → diamond)", () => {
-    const events = tierEvents(new Map([["jamsil", 2]]), [snap("jamsil", 295000)]);
+  it("reports a demotion when the tier level rises (diamond → emerald)", () => {
+    const events = tierEvents(new Map([["jamsil", 3]]), [snap("jamsil", 260000)]);
 
-    expect(events[0]).toMatchObject({ type: "TIER_DOWN", fromLevel: 2, toLevel: 3 });
+    expect(events[0]).toMatchObject({ type: "TIER_DOWN", fromLevel: 3, toLevel: 4 });
   });
 
   it("stays quiet for an unchanged tier, a new region, or a region that lost its price", () => {
-    const events = tierEvents(new Map([["jamsil", 2], ["mapo", 3]]), [
-      snap("jamsil", 305000),
+    const events = tierEvents(new Map([["jamsil", 3], ["mapo", 3]]), [
+      snap("jamsil", 280000),
       snap("mapo", null),
       snap("songdo", 100000),
     ]);

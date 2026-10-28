@@ -1,21 +1,24 @@
+/* Showroom rhythm: a big headline, then each exhibit in its own wide band. */
+
 .hero {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 24px;
-  padding: 40px 0 22px;
+  gap: 32px;
+  padding: 80px 0 44px;
 }
 
 .title {
-  font-size: clamp(30px, 4vw, 44px);
-  font-weight: 850;
-  letter-spacing: -0.035em;
-  line-height: 1.1;
+  font-size: clamp(40px, 5.4vw, 64px);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
 }
 
 .lede {
-  margin-top: 10px;
-  font-size: 15px;
+  margin-top: 14px;
+  font-size: 20px;
+  line-height: 1.45;
   color: var(--text-2);
 }
 
@@ -26,57 +29,63 @@
 }
 
 .cutoff {
-  min-width: 176px;
-  padding: 10px 14px 11px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
+  min-width: 196px;
+  padding: 16px 20px 18px;
+  border-radius: var(--radius);
   background: var(--panel);
 }
 
 .cutoff dt {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12.5px;
+  gap: 8px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--text-2);
 }
 
 .cutoff dd {
-  margin-top: 2px;
-  font-size: 13px;
+  margin-top: 6px;
+  font-size: 17px;
   color: var(--text-2);
 }
 
 .cutoff dd :global(.num) {
   margin-right: 1px;
-  font-size: 24px;
+  font-size: 32px;
   font-weight: 600;
+  letter-spacing: -0.01em;
   color: var(--text);
 }
 
 .cutoff small {
   display: block;
-  font-size: 12px;
+  margin-top: 2px;
+  font-size: 15px;
   color: var(--text-3);
 }
 
 .section {
-  margin-top: 56px;
+  margin-top: 128px;
+}
+
+.section :global(.section-head) {
+  margin-bottom: 32px;
 }
 
 .empty {
-  padding: 120px 0;
+  padding: 140px 0;
   text-align: center;
 }
 
 .empty h1 {
-  font-size: 28px;
-  font-weight: 800;
+  font-size: 40px;
+  font-weight: 600;
 }
 
 .empty p {
-  margin-top: 10px;
+  margin-top: 12px;
+  font-size: 19px;
   color: var(--text-2);
 }
 
@@ -84,10 +93,28 @@
   .hero {
     flex-direction: column;
     align-items: stretch;
-    padding-top: 28px;
+    padding: 48px 0 32px;
   }
   .cutoff {
     flex: 1;
     min-width: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  .lede {
+    font-size: 18px;
+  }
+  .cutoff {
+    padding: 14px 16px 16px;
+  }
+  .cutoff dd :global(.num) {
+    font-size: 28px;
+  }
+  .section {
+    margin-top: 88px;
+  }
+  .section :global(.section-head) {
+    margin-bottom: 24px;
   }
 }

@@ -1,0 +1,52 @@
+.picker {
+  position: relative;
+}
+
+.input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.spans {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.span {
+  padding: 8px 20px;
+  border-radius: 999px;
+  background: var(--panel-2);
+  color: var(--text-2);
+  font-size: 17px;
+  cursor: pointer;
+  transition: background 0.2s var(--ease);
+}
+
+.span:hover {
+  background: var(--panel-3);
+}
+
+.panel {
+  display: none;
+}
+
+.picker:has(.input[value="1y"]:checked) .panel[data-span="1y"],
+.picker:has(.input[value="12y"]:checked) .panel[data-span="12y"],
+.picker:has(.input[value="20y"]:checked) .panel[data-span="20y"] {
+  display: block;
+}
+
+.picker:has(.input[value="1y"]:checked) .span[data-span="1y"],
+.picker:has(.input[value="12y"]:checked) .span[data-span="12y"],
+.picker:has(.input[value="20y"]:checked) .span[data-span="20y"] {
+  background: var(--text);
+  color: var(--night);
+}
+
+.picker:has(.input:focus-visible) .spans {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+  border-radius: 999px;
+}

@@ -2,14 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { CSSProperties } from "react";
-import { TierGraph, type GraphTrade } from "@/components/charts/TierGraph";
+import { TierGraph, type GraphPoint, type GraphTrade } from "@/components/charts/TierGraph";
+import { sampleSpan, SpanPicker, type Span } from "@/components/span/SpanPicker";
 import { TierEmblem } from "@/components/emblem/TierEmblem";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { TopBar } from "@/components/site/TopBar";
 import { REGIONS, regionBySlug } from "@/data/regions";
 import { formatKoreanDate } from "@/lib/format/date";
 import { formatChange, formatEok, formatKoreanPrice, formatPercent } from "@/lib/format/price";
-import { formatClimb, formatLp, formatTier, romanDivision } from "@/lib/format/tier";
+import { formatClimb, formatGeupji, formatLp, formatTier, geupjiLabel, romanDivision } from "@/lib/format/tier";
 import { getComplexTrades, getLatestEdition } from "@/lib/queries";
 import { BASE_BAND, isQualifying } from "@/lib/stats/representative";
 import { TIERS } from "@/lib/stats/tiers";
@@ -59,7 +60,7 @@ export default async function ApartmentPage({ params }: PageProps<"/r/[slug]">) 
   const band = region.band ?? BASE_BAND;
   const trades = await getComplexTrades(snap.leader.aptSeq);
   const graphTrades: GraphTrade[] = trades
-    .filter((t) => t.dealDate >= "2021-01-01" && isQualifying(t, band))
+    .filter((t) => isQualifying(t, band))
     .map((t) => ({ dealDate: t.dealDate, priceManwon: t.priceManwon }));
   const recent = trades.filter((t) => !t.removed).slice(-12).reverse();
   const points = snap.history.map((h, i) => ({ ...h, level: snap.ladder[i]?.level ?? null }));
@@ -77,37 +78,43 @@ export default async function ApartmentPage({ params }: PageProps<"/r/[slug]">) 
     <>
       <TopBar asOf={edition.asOf} />
       <main className="page" style={{ "--c": `var(--t-${st.tier.id})` } as CSSProperties}>
-        <header className={styles.profile}>
-          <TierEmblem tier={st.tier.id} size={140} className={styles.crest} label={formatTier(st)} />
-          <div className={styles.who}>
-            <p className={styles.crumbs}>
-              <Link href="/">랭킹</Link> <span aria-hidden="true">›</span> {region.name}
-            </p>
-            <h1 className={styles.name}>{snap.leader.name}</h1>
-            <p className={styles.meta}>
-              {region.name} · {region.area}
-              {snap.leader.buildYear ? ` · ${snap.leader.buildYear}년 준공` : ""}
-            </p>
-            <p className={styles.chips}>
-              <span className={styles.rankChip}>
+        <header className={styles.hero}>
+          <p className={styles.crumbs}>
+            <Link href="/">랭킹</Link> <span aria-hidden="true">›</span> {region.name}
+          </p>
+          <TierEmblem tier={st.tier.id} size={200} className={styles.crest} />
+          <p className={styles.eyebrow}>{formatTier(st)}</p>
+          <h1 className={styles.name}>{snap.leader.name}</h1>
+          <p className={styles.meta}>
+            {region.name} · {region.area}
+            {snap.leader.buildYear ? ` · ${snap.leader.buildYear}년 준공` : ""}
+          </p>
+          <dl className={styles.figures}>
+            <div className={styles.figure}>
+              <dt>84㎡ 대표가</dt>
+              <dd className={styles.figureValue}>
+                <span className="num">{(snap.rep.priceManwon / EOK).toFixed(2)}</span>억
+              </dd>
+              <dd className={styles.figureNote}>
+                {snap.rep.stale
+                  ? `1년 넘게 거래 없음 · 마지막 ${formatKoreanDate(snap.rep.lastDealDate)}`
+                  : `최근 ${snap.rep.windowDays}일 실거래 ${snap.rep.count}건의 중위값`}
+              </dd>
+            </div>
+            <div className={styles.figure}>
+              <dt>급지</dt>
+              <dd className={styles.figureValue}>
+                <span className="num">{geupjiLabel(st.geupji)}</span>급지
+              </dd>
+              <dd className={`${styles.figureNote} num`}>{formatLp(st)}</dd>
+            </div>
+            <div className={styles.figure}>
+              <dt>순위</dt>
+              <dd className={styles.figureValue}>
                 <span className="num">#{st.rank}</span> / {total}곳
-              </span>
-              <span className={styles.tierChip}>
-                {formatTier(st)} · <span className="num">{formatLp(st)}</span>
-              </span>
-            </p>
-          </div>
-          <div className={styles.figure}>
-            <p className={styles.figureLabel}>84㎡ 대표가</p>
-            <p className={styles.figureValue}>
-              <span className="num">{(snap.rep.priceManwon / EOK).toFixed(2)}</span>억
-            </p>
-            <p className={styles.figureNote}>
-              {snap.rep.stale
-                ? `1년 넘게 거래 없음 · 마지막 ${formatKoreanDate(snap.rep.lastDealDate)}`
-                : `최근 ${snap.rep.windowDays}일 실거래 ${snap.rep.count}건의 중위값`}
-            </p>
-          </div>
+              </dd>
+            </div>
+          </dl>
         </header>
 
         <div className={styles.grid}>
@@ -120,7 +127,9 @@ export default async function ApartmentPage({ params }: PageProps<"/r/[slug]">) 
                 <TierEmblem tier={st.tier.id} size={76} />
                 <div>
                   <p className={styles.rankTier}>{formatTier(st)}</p>
-                  <p className={`${styles.rankLp} num`}>{formatLp(st)}</p>
+                  <p className={`${styles.rankLp} num`}>
+                    {formatGeupji(st)} · {formatLp(st)}
+                  </p>
                 </div>
               </div>
               {st.division !== null && (
@@ -214,13 +223,20 @@ export default async function ApartmentPage({ params }: PageProps<"/r/[slug]">) 
                 <h2 id="graph-title" className={styles.cardTitle}>
                   티어 그래프
                 </h2>
-                <p>선은 월말 대표가, 점 하나가 대표가에 들어간 84㎡ 실거래 한 건</p>
+                <p>선은 월말 대표가(그때그때의 대장), 점 하나가 지금 대장의 84㎡ 실거래 한 건</p>
               </header>
-              {(["wide", "narrow"] as const).map((variant) => (
-                <div key={variant} className={`${variant}-only`}>
-                  <TierGraph points={points} trades={graphTrades} variant={variant} />
-                </div>
-              ))}
+              <SpanPicker name="tiergraph" initial="12y">
+                {(span) => {
+                  const shown = spanPoints(points, span);
+                  const from = shown[0]?.ym ?? "";
+                  const dots = graphTrades.filter((t) => t.dealDate.slice(0, 7).replace("-", "") >= from);
+                  return (["wide", "narrow"] as const).map((variant) => (
+                    <div key={variant} className={`${variant}-only`}>
+                      <TierGraph points={shown} trades={dots} anchorManwon={st.anchorManwon} variant={variant} />
+                    </div>
+                  ));
+                }}
+              </SpanPicker>
             </section>
 
             <section className={styles.card} aria-labelledby="trades-title">
@@ -230,34 +246,36 @@ export default async function ApartmentPage({ params }: PageProps<"/r/[slug]">) 
                 </h2>
                 <p>모든 면적 · 해제된 거래는 줄을 그어 둬요</p>
               </header>
-              <table className={styles.trades}>
-                <thead>
-                  <tr>
-                    <th scope="col">계약일</th>
-                    <th scope="col">전용</th>
-                    <th scope="col">층</th>
-                    <th scope="col" className={styles.right}>
-                      거래가
-                    </th>
-                    <th scope="col">비고</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recent.map((t, i) => (
-                    <tr key={i} className={t.cancelled ? styles.cancelled : undefined}>
-                      <td className="num">{t.dealDate.slice(2).replaceAll("-", ".")}</td>
-                      <td className="num">{Math.floor(t.areaM2)}㎡</td>
-                      <td className="num">{t.floor}층</td>
-                      <td className={styles.right}>
-                        {t.cancelled ? <s>{formatKoreanPrice(t.priceManwon)}</s> : formatKoreanPrice(t.priceManwon)}
-                      </td>
-                      <td className={styles.note}>
-                        {t.cancelled ? "해제" : t.dealingType === "직거래" ? "직거래" : t.registeredOn ? "등기" : ""}
-                      </td>
+              <div className={styles.tableScroll}>
+                <table className={styles.trades}>
+                  <thead>
+                    <tr>
+                      <th scope="col">계약일</th>
+                      <th scope="col">전용</th>
+                      <th scope="col">층</th>
+                      <th scope="col" className={styles.right}>
+                        거래가
+                      </th>
+                      <th scope="col">비고</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {recent.map((t, i) => (
+                      <tr key={i} className={t.cancelled ? styles.cancelled : undefined}>
+                        <td className="num">{t.dealDate.slice(2).replaceAll("-", ".")}</td>
+                        <td className="num">{Math.floor(t.areaM2)}㎡</td>
+                        <td className="num">{t.floor}층</td>
+                        <td className={styles.right}>
+                          {t.cancelled ? <s>{formatKoreanPrice(t.priceManwon)}</s> : formatKoreanPrice(t.priceManwon)}
+                        </td>
+                        <td className={styles.note}>
+                          {t.cancelled ? "해제" : t.dealingType === "직거래" ? "직거래" : t.registeredOn ? "등기" : ""}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </section>
           </div>
         </div>
@@ -265,4 +283,11 @@ export default async function ApartmentPage({ params }: PageProps<"/r/[slug]">) 
       <SiteFooter />
     </>
   );
+}
+
+/** Month-end points inside a span, from the first month the region had a price. */
+function spanPoints(points: GraphPoint[], span: Span): GraphPoint[] {
+  const shown = sampleSpan(points, span, 1);
+  const first = shown.findIndex((p) => p.priceManwon !== null);
+  return first < 0 ? [] : shown.slice(first);
 }

@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense, type CSSProperties } from "react";
-import { CompareLines, SERIES_COLORS } from "@/components/charts/CompareLines";
+import { CompareLines } from "@/components/charts/CompareLines";
+import { SERIES_COLORS } from "@/components/charts/CompareLines.colors";
 import { TierEmblem } from "@/components/emblem/TierEmblem";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { TopBar } from "@/components/site/TopBar";
 import { REGIONS } from "@/data/regions";
 import { formatChange, formatPercent } from "@/lib/format/price";
-import { formatLp, formatTier } from "@/lib/format/tier";
+import { formatGeupji, formatLp, formatTier } from "@/lib/format/tier";
 import { getLatestEdition, type EditionView } from "@/lib/queries";
 import type { RegionSnapshot } from "@/lib/stats/snapshot";
 import { TIERS } from "@/lib/stats/tiers";
@@ -110,7 +111,7 @@ async function CompareBody({
         <ul className={styles.legend}>
           {picked.map((s, i) => (
             <li key={s.regionSlug}>
-              <i style={{ background: SERIES_COLORS[i] }} />
+              <i style={{ background: SERIES_COLORS[i] }} aria-hidden="true" />
               {nameOf(s)}
             </li>
           ))}
@@ -119,6 +120,7 @@ async function CompareBody({
           <div key={variant} className={`${variant}-only`}>
             <CompareLines
               variant={variant}
+              anchorManwon={picked[0]?.standing?.anchorManwon ?? 0}
               series={picked.map((s) => ({ slug: s.regionSlug, name: regionOf(s).name, points: s.history }))}
             />
           </div>
@@ -156,11 +158,20 @@ async function CompareBody({
                       {nameOf(s)}
                     </Link>
                     <span className={styles.area}>{regionOf(s).area}</span>
+                    {/* phones drop the tier column and carry the tier here instead */}
+                    <span className={`${styles.tier} ${styles.tierInline}`}>
+                      <TierEmblem tier={s.standing!.tier.id} size={24} />
+                      <span>
+                        {formatTier(s.standing!)} · <span className="num">{formatGeupji(s.standing!)}</span>
+                      </span>
+                    </span>
                   </td>
                   <td>
                     <span className={styles.tier}>
-                      <TierEmblem tier={s.standing!.tier.id} size={26} />
-                      {formatTier(s.standing!)}
+                      <TierEmblem tier={s.standing!.tier.id} size={30} />
+                      <span>
+                        {formatTier(s.standing!)} · <span className="num">{formatGeupji(s.standing!)}</span>
+                      </span>
                     </span>
                   </td>
                   <td className={`${styles.right} num ${styles.big}`}>{(s.rep!.priceManwon / EOK).toFixed(2)}억</td>
@@ -187,7 +198,7 @@ async function CompareBody({
           return (
             <div key={tier.id} className={styles.pickRow} style={{ "--c": `var(--t-${tier.id})` } as CSSProperties}>
               <span className={styles.pickTier}>
-                <TierEmblem tier={tier.id} size={24} />
+                <TierEmblem tier={tier.id} size={30} />
                 {tier.name}
               </span>
               <ul>
@@ -202,6 +213,7 @@ async function CompareBody({
                         aria-pressed={on >= 0}
                         scroll={false}
                       >
+                        {on >= 0 && <i className={styles.pickDot} aria-hidden="true" />}
                         {regionOf(s).name}
                       </Link>
                     </li>
@@ -220,12 +232,13 @@ function Side({ snap, name, area, color, right }: { snap: RegionSnapshot; name: 
   const st = snap.standing!;
   return (
     <div className={`${styles.side} ${right ? styles.sideRight : ""}`} style={{ "--c": `var(--t-${st.tier.id})`, "--s": color } as CSSProperties}>
-      <TierEmblem tier={st.tier.id} size={96} className={styles.sideCrest} />
+      <TierEmblem tier={st.tier.id} size={112} className={styles.sideCrest} />
       <div>
         <p className={styles.sideArea}>{area}</p>
         <p className={styles.sideName}>{name}</p>
         <p className={styles.sideTier}>
-          {formatTier(st)} · <span className="num">{formatLp(st)}</span> · <span className="num">#{st.rank}</span>
+          {formatTier(st)} · <span className="num">{formatGeupji(st)}</span> · <span className="num">{formatLp(st)}</span> ·{" "}
+          <span className="num">#{st.rank}</span>
         </p>
         <p className={styles.sidePrice}>
           <span className="num">{(snap.rep!.priceManwon / EOK).toFixed(2)}</span>억

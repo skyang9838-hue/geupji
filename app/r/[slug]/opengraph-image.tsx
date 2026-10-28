@@ -3,7 +3,7 @@ import { REGIONS, regionBySlug } from "@/data/regions";
 import { TIER_COLOR } from "@/lib/emblem/colors";
 import { formatKoreanDate } from "@/lib/format/date";
 import { formatLp, formatTier } from "@/lib/format/tier";
-import { CARD_SIZE, CardFrame, crestSrc, TEXT_2, TEXT_3 } from "@/lib/og/card";
+import { CARD_SIZE, CardFrame, crestSrc, PANEL, TEXT_2, TEXT_3 } from "@/lib/og/card";
 import { cardFonts } from "@/lib/og/fonts";
 import { getLatestEdition } from "@/lib/queries";
 
@@ -12,6 +12,12 @@ export const size = CARD_SIZE;
 export const contentType = "image/png";
 
 const EOK = 10000;
+
+/** Largest name size (up to 76px) that keeps the name on one line beside the crest. */
+function nameSize(name: string): number {
+  const ems = [...name].reduce((sum, ch) => sum + (/[ㄱ-힣]/.test(ch) ? 1 : 0.62), 0);
+  return Math.max(40, Math.min(76, Math.floor(700 / Math.max(ems, 1))));
+}
 
 export function generateStaticParams() {
   return REGIONS.map((r) => ({ slug: r.slug }));
@@ -36,30 +42,31 @@ export default async function Image({ params }: { params: Promise<{ slug: string
 
   return new ImageResponse(
     (
-      <CardFrame glow={TIER_COLOR[tier]} right={right} sample={sample}>
-        <div style={{ display: "flex", alignItems: "center", gap: 44, width: "100%" }}>
-          <img src={crestSrc(tier)} width={330} height={330} alt="" />
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <span style={{ fontSize: 26, fontWeight: 500, color: TEXT_3 }}>{place}</span>
-            <span style={{ fontSize: 64, fontWeight: 800, letterSpacing: -2, marginTop: 4 }}>{name}</span>
-            <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 10 }}>
+      <CardFrame right={right} sample={sample}>
+        <div style={{ display: "flex", alignItems: "center", gap: 48, width: "100%" }}>
+          <img src={crestSrc(tier)} width={310} height={310} alt="" />
+          <div style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
+            <span style={{ fontSize: 30, fontWeight: 500, color: TEXT_3 }}>{place}</span>
+            <span style={{ fontSize: nameSize(name), fontWeight: 800, letterSpacing: -2, lineHeight: 1.15, marginTop: 2 }}>{name}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 18, marginTop: 12 }}>
               <span
                 style={{
-                  fontSize: 28,
+                  fontSize: 32,
                   fontWeight: 800,
-                  padding: "4px 16px",
+                  padding: "6px 22px",
                   borderRadius: 999,
-                  background: `${TIER_COLOR[tier]}33`,
+                  background: PANEL,
+                  color: TIER_COLOR[tier],
                 }}
               >
                 {tierLine}
               </span>
-              <span style={{ fontFamily: "Barlow Condensed", fontSize: 32, color: TEXT_2 }}>{rankLine}</span>
+              <span style={{ fontWeight: 800, fontSize: 34, color: TEXT_2 }}>{rankLine}</span>
             </div>
-            <div style={{ display: "flex", alignItems: "baseline", marginTop: 22 }}>
-              <span style={{ fontFamily: "Barlow Condensed", fontSize: 120, lineHeight: 1 }}>{price}</span>
-              <span style={{ fontSize: 36, fontWeight: 500, color: TEXT_2, marginLeft: 6 }}>억</span>
-              <span style={{ fontSize: 24, fontWeight: 500, color: TEXT_3, marginLeft: 18 }}>84㎡ 대표가</span>
+            <div style={{ display: "flex", alignItems: "baseline", marginTop: 24 }}>
+              <span style={{ fontWeight: 800, fontSize: 136, lineHeight: 1, letterSpacing: -3 }}>{price}</span>
+              <span style={{ fontSize: 42, fontWeight: 500, color: TEXT_2, marginLeft: 8 }}>억</span>
+              <span style={{ fontSize: 28, fontWeight: 500, color: TEXT_3, marginLeft: 20 }}>84㎡ 대표가</span>
             </div>
           </div>
         </div>

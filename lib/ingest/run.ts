@@ -16,6 +16,8 @@ export interface IngestOptions {
   asOf: string;
   fetcher: (target: FetchTarget) => Promise<RawTradeItem[]>;
   log?: (message: string) => void;
+  /** Fetch only these 시군구 codes (new regions, a long backfill); the edition still covers every region. */
+  codes?: ReadonlySet<string>;
 }
 
 interface Failure extends FetchTarget {
@@ -30,12 +32,14 @@ interface Failure extends FetchTarget {
  */
 export async function runIngest(
   db: PrismaClient,
-  { kind, regions, fromYm, toYm, asOf, fetcher, log = () => {} }: IngestOptions,
+  { kind, regions, fromYm, toYm, asOf, fetcher, log = () => {}, codes }: IngestOptions,
 ): Promise<{ run: IngestRun; edition: Edition }> {
   const run = await db.ingestRun.create({ data: { kind, status: "running" } });
 
   const pending = await db.pendingFetch.findMany({ orderBy: [{ ym: "asc" }, { code: "asc" }] });
-  const targets = uniqueTargets([...pending.map(({ code, ym }) => ({ code, ym })), ...fetchPlan(regions, fromYm, toYm)]);
+  const targets = uniqueTargets([...pending.map(({ code, ym }) => ({ code, ym })), ...fetchPlan(regions, fromYm, toYm)]).filter(
+    (t) => !codes || codes.has(t.code),
+  );
 
   const seen = new Set<string>();
   const succeeded: FetchTarget[] = [];

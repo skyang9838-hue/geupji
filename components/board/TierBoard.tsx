@@ -3,7 +3,7 @@ import type { CSSProperties } from "react";
 import { TierEmblem } from "@/components/emblem/TierEmblem";
 import type { RegionDef } from "@/data/regions";
 import { formatChange } from "@/lib/format/price";
-import { formatLp, romanDivision } from "@/lib/format/tier";
+import { geupjiLabel, romanDivision } from "@/lib/format/tier";
 import type { RegionSnapshot } from "@/lib/stats/snapshot";
 import { TIERS, type Tier } from "@/lib/stats/tiers";
 import styles from "./TierBoard.module.css";
@@ -43,7 +43,8 @@ export function TierBoard({ snapshots, regions }: { snapshots: RegionSnapshot[];
                       <Link href={`/r/${region.slug}`} className={styles.chip}>
                         <span className={`${styles.rank} num`}>{st.rank}</span>
                         <span className={styles.name}>{s.leader?.name ?? region.name}</span>
-                        <span className={`${styles.step} num`}>{st.division ? romanDivision(st.division) : formatLp(st)}</span>
+                        <span className={`${styles.step} num`}>{st.division ? `${romanDivision(st.division)} · ` : ""}
+                          {geupjiLabel(st.geupji)}</span>
                         <span className={styles.area}>
                           {region.name} · {region.area}
                         </span>
@@ -71,9 +72,10 @@ export function TierBoard({ snapshots, regions }: { snapshots: RegionSnapshot[];
 }
 
 function rule(tier: Tier): string {
-  const floor = `${tier.minManwon / EOK}억`;
-  if (tier.seats) return `${tier.seats}자리 · ${floor} 이상`;
-  if (tier.id === "iron") return `${TIERS[tier.level - 1].minManwon / EOK}억 미만`;
-  if (tier.id === "master") return `${floor} 이상`;
-  return `${floor} ~ ${TIERS[tier.level - 1].minManwon / EOK}억`;
+  const worst = tier.maxGeupji.toFixed(1);
+  if (tier.seats) return `${tier.seats}자리 · ${worst}급지 이내`;
+  const best = TIERS[tier.level - 1].maxGeupji.toFixed(1);
+  if (tier.id === "iron") return `${best}급지 넘음`;
+  if (tier.id === "master") return `${worst}급지 이내`;
+  return `${best} ~ ${worst}급지`;
 }

@@ -12,6 +12,19 @@ export function formatTier(s: Standing): string {
   return s.division ? `${s.tier.name} ${romanDivision(s.division)}` : s.tier.name;
 }
 
+/** "2.1급지" — one decimal, as the community 급지표 writes it. */
+export function formatGeupji(s: Standing): string {
+  return `${geupjiLabel(s.geupji)}급지`;
+}
+
+/**
+ * One decimal, rounded up: a tier owns (better bound, worse bound], so 2.12
+ * (emerald) reads 2.2, never the diamond-looking 2.1.
+ */
+export function geupjiLabel(g: number): string {
+  return (Math.ceil(g * 10 - 1e-9) / 10).toFixed(1);
+}
+
 export function formatLp(s: Standing): string {
   return `${grouped.format(s.lp)} LP`;
 }

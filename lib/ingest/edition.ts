@@ -87,7 +87,7 @@ export async function publishEdition(
     );
   }
 
-  const snapshots = rankEdition(facts);
+  const snapshots = rankEdition(facts, new Set(regions.filter((r) => r.sido === "서울").map((r) => r.slug)));
 
   const existing = await db.edition.findUnique({ where: { asOf: asOfDate } });
   const earlierTrades = ((existing?.events ?? []) as unknown as EditionEvent[]).filter(

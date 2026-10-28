@@ -1,26 +1,29 @@
 /* ───────────────────────────────────────────────────────────────
    급지.gg — design tokens
-   A night ladder: slate-navy surfaces, quiet chrome, and color only
-   where a tier is named. Rises are red ▲, falls blue ▼ (Korean market
+   Apple's dark showroom: black canvas, #161617 tiles, near-white type,
+   one blue for action, and color only where a tier is named (the
+   emblems play the part Apple gives to product photography). Rises are red ▲, falls blue ▼ (Korean market
    convention), always with the arrow so color never speaks alone.
    ─────────────────────────────────────────────────────────────── */
 
 :root {
   color-scheme: dark;
 
-  --night: #0b0f19;
-  --night-2: #0e1320;
-  --panel: #131a28;
-  --panel-2: #182132;
-  --panel-3: #1f293d;
-  --line: #222b3d;
-  --line-2: #2e394f;
-  --text: #e8ecf4;
-  --text-2: #a6b0c4;
-  --text-3: #7d889e;
+  --night: #000000;
+  --night-2: #0a0a0b;
+  --panel: #161617;
+  --panel-2: #1d1d1f;
+  --panel-3: #272729;
+  --line: #1d1d1f;
+  --line-2: #333336;
+  --text: #f5f5f7;
+  --text-2: #c7c7cc;
+  --text-3: #98989d;
   --up: #ff5d63;
-  --down: #4f8dff;
-  --focus: #9bb4ff;
+  --down: #2997ff;
+  --focus: #2997ff;
+  --link: #2997ff;
+  --action: #0071e3;
   --sample: #f5c46b;
 
   --t-challenger: #f2c75c;
@@ -36,11 +39,11 @@
   --t-iron: #857f92;
 
   --font-ui: "Pretendard Variable", Pretendard, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-  --font-num: var(--font-barlow), var(--font-ui);
+  --font-num: var(--font-ui);
 
   --page: 1200px;
   --gutter: clamp(16px, 4vw, 40px);
-  --radius: 10px;
+  --radius: 18px;
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
@@ -65,8 +68,8 @@ body {
   background: var(--night);
   color: var(--text);
   font-family: var(--font-ui);
-  font-size: 15px;
-  line-height: 1.55;
+  font-size: 17px;
+  line-height: 1.47;
   word-break: keep-all;
   overflow-wrap: break-word;
   -webkit-font-smoothing: antialiased;
@@ -91,7 +94,7 @@ table {
 }
 
 ::selection {
-  background: #3a4e86;
+  background: #0071e3;
   color: #fff;
 }
 
@@ -113,7 +116,14 @@ table {
 .num {
   font-family: var(--font-num);
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.01em;
+}
+
+/* Display type: semibold with Apple's tight optical tracking; body keeps 0. */
+h1,
+h2,
+h3 {
+  font-weight: 600;
+  letter-spacing: -0.022em;
 }
 
 .up {
@@ -142,20 +152,20 @@ table {
 /* A section's title row: name, then what it shows */
 .section-head {
   display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 4px 14px;
-  margin-bottom: 16px;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 24px;
 }
 
 .section-head h2 {
-  font-size: 21px;
-  font-weight: 750;
-  letter-spacing: -0.01em;
+  font-size: clamp(28px, 3.4vw, 40px);
+  font-weight: 600;
+  letter-spacing: -0.022em;
+  line-height: 1.12;
 }
 
 .section-head p {
-  font-size: 13px;
+  font-size: 17px;
   color: var(--text-3);
 }
 

@@ -66,6 +66,8 @@ export const REGIONS: RegionDef[] = [
   },
   { slug: "magok", name: "마곡", area: "서울 강서구", sido: "서울", districts: [{ code: "11500" }], dongs: ["마곡동", "가양동", "내발산동"] },
   { slug: "nowon", name: "노원", area: "서울 노원구", sido: "서울", districts: [{ code: "11350" }], dongs: ["상계동", "중계동", "하계동"] },
+  { slug: "dobong", name: "도봉", area: "서울 도봉구", sido: "서울", districts: [{ code: "11320" }], dongs: ["창동", "쌍문동", "방학동", "도봉동"] },
+  { slug: "gangbuk", name: "강북", area: "서울 강북구", sido: "서울", districts: [{ code: "11305" }], dongs: ["미아동", "번동", "수유동", "우이동"] },
 
   // ── 경기 ───────────────────────────────────────────
   {
@@ -86,6 +88,16 @@ export const REGIONS: RegionDef[] = [
     dongs: ["원문동", "별양동", "중앙동", "부림동", "갈현동", "문원동", "주암동", "과천동"],
   },
   { slug: "gwanggyo", name: "광교", area: "수원 영통구", sido: "경기", districts: [{ code: "41117" }], dongs: ["이의동", "하동", "원천동"] },
+  { slug: "yeongtong", name: "영통", area: "수원 영통구", sido: "경기", districts: [{ code: "41117" }], dongs: ["영통동", "매탄동", "망포동"] },
+  { slug: "suji", name: "수지", area: "용인 수지구", sido: "경기", districts: [{ code: "41465" }], dongs: ["풍덕천동", "성복동", "상현동", "신봉동", "동천동"] },
+  {
+    slug: "jukjeon",
+    name: "죽전",
+    area: "용인 수지구·기흥구",
+    sido: "경기",
+    districts: [{ code: "41465" }, { code: "41463" }],
+    dongs: ["죽전동", "보정동"],
+  },
   { slug: "pyeongchon", name: "평촌", area: "안양 동안구", sido: "경기", districts: [{ code: "41173" }], dongs: ["평촌동", "호계동", "비산동", "관양동"] },
   { slug: "gwangmyeong", name: "광명", area: "광명시", sido: "경기", districts: [{ code: "41210" }], dongs: ["광명동", "철산동", "하안동", "소하동"] },
   { slug: "misa", name: "미사", area: "하남시", sido: "경기", districts: [{ code: "41450" }], dongs: ["망월동", "풍산동", "선동", "미사동"] },
@@ -115,6 +127,7 @@ export const REGIONS: RegionDef[] = [
       "석우동",
       "금곡동",
     ],
+    leaderAptSeq: "41590-2074",
   },
   {
     slug: "ilsan",
@@ -150,7 +163,6 @@ export const REGIONS: RegionDef[] = [
     dongs: ["당하동", "원당동", "마전동", "불로동", "오류동", "왕길동", "백석동"],
   },
   { slug: "jakjeon", name: "작전", area: "인천 계양구", sido: "인천", districts: [{ code: "28245" }], dongs: ["작전동", "서운동"] },
-  { slug: "guwol", name: "구월", area: "인천 남동구", sido: "인천", districts: [{ code: "28200" }], dongs: ["구월동", "간석동"] },
 ];
 
 export function regionBySlug(slug: string): RegionDef | undefined {

@@ -1,16 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { scaleLinear } from "d3-scale";
 import { line } from "d3-shape";
 import { TIER_COLOR } from "@/lib/emblem/colors";
-import { TIERS } from "@/lib/stats/tiers";
+import { TIERS, tierPriceRange } from "@/lib/stats/tiers";
+import { SERIES_COLORS } from "./CompareLines.colors";
 import styles from "./CompareLines.module.css";
 
-const EOK = 10000;
+export { SERIES_COLORS };
 
-/** Series slots, validated for the night surface (all four pass the dataviz checks). */
-export const SERIES_COLORS = ["#cc7d0b", "#2d97d2", "#d8468a", "#6c9f28"];
+const EOK = 10000;
 
 export interface CompareSeries {
   slug: string;
@@ -19,12 +19,37 @@ export interface CompareSeries {
 }
 
 /** Up to four month-end price lines on one axis, over the tier bands; one tooltip lists them all. */
-export function CompareLines({ series, variant }: { series: CompareSeries[]; variant: "wide" | "narrow" }) {
+export function CompareLines({
+  series,
+  anchorManwon,
+  variant,
+}: {
+  series: CompareSeries[];
+  /** Today's Seoul anchor: the bands are drawn at today's 급지 prices. */
+  anchorManwon: number;
+  variant: "wide" | "narrow";
+}) {
   const [hover, setHover] = useState<number | null>(null);
   const wide = variant === "wide";
-  const W = wide ? 1100 : 360;
-  const H = wide ? 400 : 300;
-  const M = wide ? { top: 16, right: 150, bottom: 30, left: 50 } : { top: 14, right: 78, bottom: 28, left: 38 };
+  // Draw at the frame's real width so SVG type stays at its stated px size
+  // instead of shrinking with the viewBox (the default holds until measured).
+  const frame = useRef<HTMLDivElement>(null);
+  const [measured, setMeasured] = useState<number | null>(null);
+  useLayoutEffect(() => {
+    const el = frame.current;
+    if (!el) return;
+    const read = () => {
+      const w = Math.round(el.getBoundingClientRect().width);
+      if (w > 0) setMeasured(Math.max(wide ? 560 : 300, w));
+    };
+    read();
+    const ro = new ResizeObserver(read);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [wide]);
+  const W = measured ?? (wide ? 1100 : 320);
+  const H = wide ? 440 : 320;
+  const M = wide ? { top: 18, right: 128, bottom: 40, left: 56 } : { top: 16, right: 80, bottom: 36, left: 46 };
 
   const months = series[0]?.points.map((p) => p.ym) ?? [];
   const values = series.flatMap((s) => s.points.map((p) => p.priceManwon).filter((v): v is number => v !== null));
@@ -46,7 +71,10 @@ export function CompareLines({ series, variant }: { series: CompareSeries[]; var
 
   const bands = [...TIERS]
     .reverse()
-    .map((tier) => ({ tier, lo: Math.max(tier.minManwon, d0), hi: Math.min(tier.level === 0 ? Infinity : TIERS[tier.level - 1].minManwon, d1) }))
+    .flatMap((tier) => {
+      const range = tierPriceRange(tier, anchorManwon);
+      return range ? [{ tier, lo: Math.max(range.lo, d0), hi: Math.min(range.hi, d1) }] : [];
+    })
     .filter((b) => b.hi > b.lo);
 
   // end labels, nudged apart when two lines finish close together
@@ -57,12 +85,15 @@ export function CompareLines({ series, variant }: { series: CompareSeries[]; var
     })
     .filter((e): e is NonNullable<typeof e> => e !== null)
     .sort((a, b) => a.y - b.y);
-  for (let k = 1; k < ends.length; k++) if (ends[k].y - ends[k - 1].y < 36) ends[k].y = ends[k - 1].y + 36;
+  const endGap = wide ? 48 : 44;
+  for (let k = 1; k < ends.length; k++) if (ends[k].y - ends[k - 1].y < endGap) ends[k].y = ends[k - 1].y + endGap;
 
+  // every January gets a grid line; labels skip years when they would crowd
   const years = months.map((ym, i) => ({ ym, i })).filter(({ ym }) => ym.endsWith("01"));
+  const yearStep = x(12) - x(0) < (wide ? 76 : 44) ? 2 : 1;
 
   return (
-    <div className={styles.frame}>
+    <div className={styles.frame} ref={frame}>
       <svg
         viewBox={`0 0 ${W} ${H}`}
         className={styles.svg}
@@ -77,10 +108,10 @@ export function CompareLines({ series, variant }: { series: CompareSeries[]; var
       >
         {bands.map(({ tier, lo: bLo, hi: bHi }) => (
           <g key={tier.id}>
-            <rect x={M.left} y={y(bHi)} width={W - M.left - M.right} height={y(bLo) - y(bHi)} fill={TIER_COLOR[tier.id]} opacity={tier.level % 2 === 0 ? 0.06 : 0.03} />
-            {bLo > d0 && <line x1={M.left} x2={W - M.right} y1={y(bLo)} y2={y(bLo)} stroke={TIER_COLOR[tier.id]} strokeOpacity={0.3} />}
-            {y(bLo) - y(bHi) > 16 && (
-              <text x={M.left + 8} y={y(bHi) + 13} className={styles.band}>
+            <rect x={M.left} y={y(bHi)} width={W - M.left - M.right} height={y(bLo) - y(bHi)} fill={TIER_COLOR[tier.id]} opacity={tier.level % 2 === 0 ? 0.045 : 0.025} />
+            {bLo > d0 && <line x1={M.left} x2={W - M.right} y1={y(bLo)} y2={y(bLo)} stroke={TIER_COLOR[tier.id]} strokeOpacity={0.22} />}
+            {y(bLo) - y(bHi) > 24 && (
+              <text x={M.left + 10} y={y(bHi) + 20} className={styles.band} fill={TIER_COLOR[tier.id]}>
                 {tier.name}
               </text>
             )}
@@ -91,12 +122,14 @@ export function CompareLines({ series, variant }: { series: CompareSeries[]; var
             {v / EOK}억
           </text>
         ))}
-        {years.map(({ ym, i }) => (
+        {years.map(({ ym, i }, k) => (
           <g key={ym}>
             <line x1={x(i)} x2={x(i)} y1={M.top} y2={H - M.bottom} className={styles.grid} />
-            <text x={x(i)} y={H - 8} textAnchor="middle" className={styles.tick}>
-              {wide ? `${ym.slice(0, 4)}년` : `’${ym.slice(2, 4)}`}
-            </text>
+            {k % yearStep === 0 && (
+              <text x={x(i)} y={H - 8} textAnchor={i === 0 ? "start" : "middle"} className={styles.tick}>
+                {wide ? `${ym.slice(0, 4)}년` : `’${ym.slice(2, 4)}`}
+              </text>
+            )}
           </g>
         ))}
 
@@ -105,12 +138,12 @@ export function CompareLines({ series, variant }: { series: CompareSeries[]; var
         ))}
 
         {ends.map((e) => (
-          <g key={e.i} transform={`translate(${W - M.right + 10}, ${e.y})`}>
-            <rect x={0} y={-1.5} width={12} height={3} rx={1.5} fill={SERIES_COLORS[e.i]} />
-            <text x={18} y={-2} dominantBaseline="middle" className={styles.endName}>
+          <g key={e.i} transform={`translate(${W - M.right + (wide ? 12 : 8)}, ${e.y})`}>
+            {wide && <rect x={0} y={-8} width={12} height={4} rx={2} fill={SERIES_COLORS[e.i]} />}
+            <text x={wide ? 20 : 0} y={-1} className={styles.endName} fill={wide ? undefined : SERIES_COLORS[e.i]}>
               {e.name}
             </text>
-            <text x={18} y={16} className={styles.endValue}>
+            <text x={wide ? 20 : 0} y={20} className={styles.endValue}>
               {(e.value / EOK).toFixed(2)}억
             </text>
           </g>

@@ -18,10 +18,16 @@ const facts = (regionSlug: string, eok: number | null, history: Record<string, n
 
 describe("rankEdition", () => {
   it("gives each region its standing in today's ranking", () => {
-    const [banpo, jamsil] = rankEdition([facts("banpo", 53.9), facts("jamsil", 32.1)]);
+    const [banpo, songdo] = rankEdition([facts("banpo", 50), facts("songdo", 12)], new Set(["banpo"]));
 
-    expect(banpo.standing).toMatchObject({ rank: 1, tier: { id: "challenger" } });
-    expect(jamsil.standing).toMatchObject({ rank: 2, tier: { id: "master" } });
+    expect(banpo.standing).toMatchObject({ rank: 1, tier: { id: "challenger" }, anchorManwon: 500000 });
+    expect(songdo.standing).toMatchObject({ rank: 2, tier: { id: "silver" } });
+  });
+
+  it("lets every region set the anchor when no Seoul set is given", () => {
+    const [, songdo] = rankEdition([facts("banpo", 50), facts("songdo", 12)]);
+
+    expect(songdo.standing).toMatchObject({ anchorManwon: 310000, tier: { id: "platinum" } });
   });
 
   it("records every month's rank and tier", () => {
@@ -31,8 +37,8 @@ describe("rankEdition", () => {
     ]);
 
     expect(a.ladder).toEqual([
-      { ym: "202512", rank: 2, level: 2 },
-      { ym: "202601", rank: 1, level: 2 },
+      { ym: "202512", rank: 2, level: 1 },
+      { ym: "202601", rank: 1, level: 0 },
     ]);
   });
 
@@ -40,8 +46,8 @@ describe("rankEdition", () => {
     const [a] = rankEdition([facts("a", 31, { "202511": 26, "202512": 30, "202601": 31 })]);
 
     expect(a.seasons).toEqual([
-      { year: 2025, level: 2, division: null, priceManwon: 300000 },
-      { year: 2026, level: 2, division: null, priceManwon: 310000 },
+      { year: 2025, level: 0, division: null, priceManwon: 300000 },
+      { year: 2026, level: 0, division: null, priceManwon: 310000 },
     ]);
   });
 
@@ -57,6 +63,6 @@ describe("rankEdition", () => {
     const [none, a] = rankEdition([facts("none", null), facts("a", 31, { "202512": 30 })]);
 
     expect(none.ladder).toEqual([{ ym: "202512", rank: null, level: null }]);
-    expect(a.ladder).toEqual([{ ym: "202512", rank: 1, level: 2 }]);
+    expect(a.ladder).toEqual([{ ym: "202512", rank: 1, level: 0 }]);
   });
 });

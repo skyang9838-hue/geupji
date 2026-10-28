@@ -2,15 +2,17 @@ import type { ReactNode } from "react";
 import { brandFacets, crestFacets } from "@/lib/emblem/geometry";
 import type { TierId } from "@/lib/stats/tiers";
 
-/** Shared frame for share cards, in the site's night palette. Inline styles only (Satori). */
+/** Shared frame for share cards: Apple's dark showroom (flat black, no gradient). Inline styles only (Satori). */
 
 export const CARD_SIZE = { width: 1200, height: 630 };
 
-export const NIGHT = "#0b0f19";
-export const TEXT = "#e8ecf4";
-export const TEXT_2 = "#a6b0c4";
-export const TEXT_3 = "#7d889e";
-export const LINE = "#222b3d";
+export const NIGHT = "#000000";
+export const TEXT = "#f5f5f7";
+export const TEXT_2 = "#c7c7cc";
+export const TEXT_3 = "#98989d";
+export const LINE = "#333336";
+export const PANEL = "#1d1d1f";
+const SAMPLE = "#f5c46b";
 
 /** A crest as an <img> data URI; Satori draws SVG images more faithfully than inline SVG. */
 export function crestSrc(tier: TierId | "brand"): string {
@@ -23,12 +25,10 @@ export function crestSrc(tier: TierId | "brand"): string {
 }
 
 export function CardFrame({
-  glow,
   right,
   sample,
   children,
 }: {
-  glow: string;
   right: string;
   sample: boolean;
   children: ReactNode;
@@ -40,22 +40,22 @@ export function CardFrame({
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        background: `radial-gradient(circle at 18% 46%, ${glow}24 0%, ${NIGHT} 46%)`,
+
         backgroundColor: NIGHT,
-        padding: "44px 60px 40px",
+        padding: "48px 64px 44px",
         fontFamily: "Noto Sans KR",
         color: TEXT,
       }}
     >
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <img src={crestSrc("brand")} width={40} height={40} alt="" />
-          <span style={{ fontSize: 30, fontWeight: 800, letterSpacing: -1 }}>급지</span>
-          <span style={{ fontFamily: "Barlow Condensed", fontSize: 30, color: TEXT_3, marginLeft: -6 }}>.gg</span>
+          <img src={crestSrc("brand")} width={44} height={44} alt="" />
+          <span style={{ fontSize: 34, fontWeight: 800, letterSpacing: -0.8 }}>급지</span>
+          <span style={{ fontWeight: 800, fontSize: 34, color: TEXT_3, marginLeft: -10 }}>.gg</span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 20, fontWeight: 500, color: TEXT_3 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 24, fontWeight: 500, color: TEXT_3 }}>
           {sample && (
-            <span style={{ padding: "2px 10px", borderRadius: 6, background: "#2a2112", color: "#f5c46b" }}>견본 데이터</span>
+            <span style={{ padding: "4px 16px", borderRadius: 999, background: PANEL, color: SAMPLE }}>견본 데이터</span>
           )}
           <span>{right}</span>
         </div>

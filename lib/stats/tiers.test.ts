@@ -1,10 +1,25 @@
 import { describe, expect, it } from "vitest";
-import { bandTier, rankStandings, TIERS } from "./tiers";
+import { anchorPrice, bandTier, geupji, priceAtGeupji, rankStandings, TIERS } from "./tiers";
 
 const EOK = 10000; // 1억 = 10,000만원
+const ANCHOR = 50 * EOK;
 
-const standings = (prices: Record<string, number | null>) =>
-  rankStandings(Object.entries(prices).map(([key, eok]) => ({ key, priceManwon: eok === null ? null : Math.round(eok * EOK) })));
+const standings = (prices: Record<string, number | null>, anchors: string[] = []) =>
+  rankStandings(
+    Object.entries(prices).map(([key, eok]) => ({
+      key,
+      priceManwon: eok === null ? null : Math.round(eok * EOK),
+      anchor: anchors.includes(key),
+    })),
+  );
+
+/** One region at a given 급지 against a lone 50억 anchor. */
+const at = (g: number) => Math.round(priceAtGeupji(g, ANCHOR));
+const alone = (g: number) =>
+  rankStandings([
+    { key: "anchor", priceManwon: ANCHOR, anchor: true },
+    { key: "me", priceManwon: at(g) },
+  ]).get("me")!;
 
 describe("TIERS", () => {
   it("runs the League ladder from challenger down to iron", () => {
@@ -24,14 +39,51 @@ describe("TIERS", () => {
   });
 });
 
-describe("bandTier", () => {
-  it("counts a price exactly on a floor as the higher tier", () => {
-    expect(bandTier(30 * EOK).id).toBe("master");
-    expect(bandTier(30 * EOK - 1).id).toBe("diamond");
+describe("geupji", () => {
+  it("is 1.0 at the anchor and never better", () => {
+    expect(geupji(ANCHOR, ANCHOR)).toBe(1);
+    expect(geupji(ANCHOR * 1.2, ANCHOR)).toBe(1);
   });
 
-  it("places prices by floor: 25억 diamond, 20억 emerald, 16억 platinum, 12억 gold, 9억 silver, 6억 bronze", () => {
-    expect([25, 20, 16, 12, 9, 6, 5.9].map((e) => bandTier(e * EOK).id)).toEqual([
+  it("grows with the log of the gap: half the anchor is 1 + 1.8 ln 2", () => {
+    expect(geupji(ANCHOR / 2, ANCHOR)).toBeCloseTo(1 + 1.8 * Math.LN2, 10);
+  });
+
+  it("turns back into the same price", () => {
+    expect(priceAtGeupji(geupji(123456, ANCHOR), ANCHOR)).toBeCloseTo(123456, 6);
+  });
+});
+
+describe("anchorPrice", () => {
+  it("averages the top three anchors and ignores the rest", () => {
+    const entries = [
+      { priceManwon: 60, anchor: true },
+      { priceManwon: 50, anchor: true },
+      { priceManwon: 40, anchor: true },
+      { priceManwon: 10, anchor: true },
+      { priceManwon: 99, anchor: false },
+    ];
+    expect(anchorPrice(entries)).toBe(50);
+  });
+
+  it("falls back to every entry when no anchor has a price", () => {
+    expect(anchorPrice([{ priceManwon: null, anchor: true }, { priceManwon: 12 }])).toBe(12);
+  });
+
+  it("counts every entry when none is marked, and is null with no price", () => {
+    expect(anchorPrice([{ priceManwon: 30 }, { priceManwon: 10 }])).toBe(20);
+    expect(anchorPrice([{ priceManwon: null }])).toBeNull();
+  });
+});
+
+describe("bandTier", () => {
+  it("counts a 급지 exactly on a bound as the better tier", () => {
+    expect(bandTier(1.7).id).toBe("master");
+    expect(bandTier(1.71).id).toBe("diamond");
+  });
+
+  it("places 급지 by bound: 2.1 diamond, 2.4 emerald, 2.8 platinum, 3.2 gold, 3.6 silver, 4.0 bronze", () => {
+    expect([2.1, 2.4, 2.8, 3.2, 3.6, 4.0, 4.01].map((g) => bandTier(g).id)).toEqual([
       "diamond",
       "emerald",
       "platinum",
@@ -42,8 +94,8 @@ describe("bandTier", () => {
     ]);
   });
 
-  it("never hands out an apex seat by price alone", () => {
-    expect(bandTier(80 * EOK).id).toBe("master");
+  it("never hands out an apex seat by 급지 alone", () => {
+    expect(bandTier(1).id).toBe("master");
   });
 });
 
@@ -65,82 +117,72 @@ describe("rankStandings", () => {
     expect(s.get("b")?.rank).toBe(2);
   });
 
-  it("seats the single challenger: first place, at 50억 or more", () => {
-    const s = standings({ banpo: 53.9, apgujeong: 52 });
+  it("measures 급지 against the anchors only", () => {
+    const s = standings({ banpo: 50, songdo: 12 }, ["banpo"]);
 
-    expect(s.get("banpo")?.tier.id).toBe("challenger");
-    expect(s.get("apgujeong")?.tier.id).toBe("grandmaster");
+    expect(s.get("songdo")).toMatchObject({ tier: { id: "silver" }, anchorManwon: ANCHOR });
+    expect(s.get("songdo")!.geupji).toBeCloseTo(1 + 1.8 * Math.log(50 / 12), 10);
   });
 
-  it("leaves the throne empty when first place is under 50억", () => {
-    const s = standings({ banpo: 48, daechi: 38 });
+  it("keeps the tiers when the whole market rises together", () => {
+    const before = standings({ banpo: 50, mapo: 28, songdo: 12 }, ["banpo"]);
+    const after = standings({ banpo: 65, mapo: 36.4, songdo: 15.6 }, ["banpo"]);
 
-    expect(s.get("banpo")?.tier.id).toBe("grandmaster");
-    expect(s.get("daechi")?.tier.id).toBe("grandmaster");
+    for (const key of ["banpo", "mapo", "songdo"]) {
+      expect(after.get(key)?.tier.id).toBe(before.get(key)?.tier.id);
+      expect(after.get(key)?.geupji).toBeCloseTo(before.get(key)!.geupji, 10);
+    }
   });
 
-  it("fills two grandmaster seats from 35억; the rest of 30억+ stay master", () => {
-    const s = standings({ banpo: 53.9, daechi: 38.9, gaepo: 36.8, apgujeong: 36, jamsil: 32.1, yongsan: 34 });
+  it("seats one challenger and two grandmasters inside 1.7급지; the rest there stay master", () => {
+    const s = standings({ a: 50, b: 45, c: 42, d: 40 });
 
-    expect(["daechi", "gaepo"].map((k) => s.get(k)?.tier.id)).toEqual(["grandmaster", "grandmaster"]);
-    expect(["apgujeong", "yongsan", "jamsil"].map((k) => s.get(k)?.tier.id)).toEqual(["master", "master", "master"]);
+    expect(["a", "b", "c", "d"].map((k) => s.get(k)?.tier.id)).toEqual([
+      "challenger",
+      "grandmaster",
+      "grandmaster",
+      "master",
+    ]);
   });
 
-  it("keeps a grandmaster seat empty rather than give it to a price under 35억", () => {
-    const s = standings({ banpo: 53.9, jamsil: 34.9 });
-
-    expect(s.get("jamsil")?.tier.id).toBe("master");
+  it("keeps a grandmaster seat empty rather than seat a region past 1.7급지", () => {
+    expect(standings({ banpo: 50, songdo: 12 }, ["banpo"]).get("songdo")?.tier.id).toBe("silver");
+    expect(alone(1.71).tier.id).toBe("diamond");
   });
 
   it("splits a tier into divisions IV–I and counts LP inside the division", () => {
-    // diamond 25–30억 in 1.25억 steps: 28.2억 sits in II, 56% of the way to I
-    const s = standings({ seongsu: 28.2 });
-
-    expect(s.get("seongsu")).toMatchObject({ tier: { id: "diamond" }, division: 2, lp: 56 });
+    // diamond 1.7–2.1급지 in 0.1 steps: 1.8655 sits in II, 34% of the way to I
+    expect(alone(1.8655)).toMatchObject({ tier: { id: "diamond" }, division: 2, lp: 34 });
   });
 
   it("starts a tier at division IV with 0 LP", () => {
-    expect(standings({ a: 12 }).get("a")).toMatchObject({ tier: { id: "gold" }, division: 4, lp: 0 });
+    expect(alone(2.0999)).toMatchObject({ tier: { id: "diamond" }, division: 4, lp: 0 });
   });
 
-  it("puts anything under 3억 at Iron IV, 0 LP", () => {
-    expect(standings({ a: 2 }).get("a")).toMatchObject({ tier: { id: "iron" }, division: 4, lp: 0 });
+  it("puts anything past 4.4급지 at Iron IV, 0 LP", () => {
+    expect(alone(5)).toMatchObject({ tier: { id: "iron" }, division: 4, lp: 0 });
   });
 
-  it("gives apex tiers no division and one LP per 100만원 above 30억", () => {
-    const s = standings({ banpo: 53.9, jamsil: 32.13 });
-
-    expect(s.get("banpo")).toMatchObject({ division: null, lp: 2390 });
-    expect(s.get("jamsil")).toMatchObject({ division: null, lp: 213 });
+  it("gives apex tiers no division and one LP per 100만원 over master's floor", () => {
+    expect(rankStandings([{ key: "a", priceManwon: ANCHOR }]).get("a")).toMatchObject({ division: null, lp: 1610 });
+    expect(alone(1.5)).toMatchObject({ tier: { id: "grandmaster" }, division: null, lp: 398 });
   });
 
   it("measures the climb to the next division floor", () => {
-    // Diamond II → Diamond I at 28.75억
-    expect(standings({ seongsu: 28.2 }).get("seongsu")?.toNext).toBe(5500);
+    // Diamond II → Diamond I at 1.8급지
+    expect(alone(1.8655).toNext).toBe(11457);
   });
 
   it("measures division I's climb to the next tier's floor", () => {
-    expect(standings({ a: 29.5 }).get("a")?.toNext).toBe(5000);
+    expect(alone(1.75).toNext).toBe(9285);
   });
 
-  it("measures master's climb to the lowest grandmaster once both seats are taken", () => {
-    const s = standings({ banpo: 53.9, daechi: 38.9, gaepo: 36.8, jamsil: 32.1 });
-
-    expect(s.get("jamsil")?.toNext).toBe(368000 - 321000);
-  });
-
-  it("measures master's climb to 35억 while a grandmaster seat is open", () => {
-    expect(standings({ banpo: 53.9, jamsil: 32.1 }).get("jamsil")?.toNext).toBe(350000 - 321000);
+  it("measures master's climb to the lowest grandmaster", () => {
+    expect(standings({ a: 50, b: 45, c: 42, d: 40 }).get("d")?.toNext).toBe(420000 - 400000);
   });
 
   it("measures a grandmaster's climb to the challenger's price", () => {
-    const s = standings({ banpo: 53.9, daechi: 38.9 });
-
-    expect(s.get("daechi")?.toNext).toBe(539000 - 389000);
-  });
-
-  it("measures a grandmaster's climb to 50억 while the throne is empty", () => {
-    expect(standings({ banpo: 48 }).get("banpo")?.toNext).toBe(20000);
+    expect(standings({ a: 50, b: 45, c: 42, d: 40 }).get("c")?.toNext).toBe(500000 - 420000);
   });
 
   it("has nothing left to climb for the challenger", () => {

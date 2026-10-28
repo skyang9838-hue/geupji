@@ -4,6 +4,7 @@
  *   npm run ingest                              # daily: this month and the two before
  *   npm run ingest -- --from 202101 --to 202609 # backfill a range
  *   npm run ingest -- --plan                    # show what would be requested, fetch nothing
+ *   npm run ingest -- --from 200601 --to 202012 --codes 11320,11305  # only these 시군구
  *
  * Needs DATABASE_URL and MOLIT_SERVICE_KEY. With SITE_URL and REVALIDATE_SECRET
  * set, the live site is told to refresh once the edition is published.
@@ -18,6 +19,7 @@ const { values } = parseArgs({
     from: { type: "string" },
     to: { type: "string" },
     plan: { type: "boolean", default: false },
+    codes: { type: "string" },
   },
 });
 
@@ -34,9 +36,10 @@ async function main() {
   const toYm = values.to ?? thisMonth;
   const fromYm = values.from ?? shiftMonth(toYm, -2);
   const kind = values.from ? "backfill" : "daily";
+  const codes = values.codes ? new Set(values.codes.split(",").map((c) => c.trim())) : undefined;
 
   if (values.plan) {
-    const plan = fetchPlan(REGIONS, fromYm, toYm);
+    const plan = fetchPlan(REGIONS, fromYm, toYm).filter((t) => !codes || codes.has(t.code));
     console.log(`${plan.length} requests for ${fromYm}–${toYm}:`);
     for (const t of plan) console.log(`  ${t.code} ${t.ym}`);
     return;
@@ -58,6 +61,7 @@ async function main() {
     toYm,
     asOf,
     fetcher: (target) => fetchMonth(target, { serviceKey }),
+    codes,
     log: (line) => console.log(line),
   });
 

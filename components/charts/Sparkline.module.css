@@ -5,8 +5,8 @@
 
 .line {
   fill: none;
-  stroke: #5a6680;
-  stroke-width: 1.5;
+  stroke: var(--text-3);
+  stroke-width: 1.75;
   stroke-linejoin: round;
   stroke-linecap: round;
 }

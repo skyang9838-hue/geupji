@@ -1,5 +1,4 @@
 import { ImageResponse } from "next/og";
-import { TIER_COLOR } from "@/lib/emblem/colors";
 import { formatKoreanDate } from "@/lib/format/date";
 import { formatTier } from "@/lib/format/tier";
 import { CARD_SIZE, CardFrame, crestSrc, TEXT_2, TEXT_3 } from "@/lib/og/card";
@@ -31,27 +30,27 @@ export default async function Image() {
 
   return new ImageResponse(
     (
-      <CardFrame glow={TIER_COLOR[lead]} right={right} sample={sample}>
-        <div style={{ display: "flex", flexDirection: "column", width: "100%", paddingTop: 22 }}>
-          <div style={{ display: "flex", fontSize: 66, fontWeight: 800, letterSpacing: -2.5 }}>{title}</div>
-          <div style={{ display: "flex", alignItems: "center", gap: 34, marginTop: 18 }}>
-            <img src={crestSrc(lead)} width={200} height={200} alt="" />
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <CardFrame right={right} sample={sample}>
+        <div style={{ display: "flex", flexDirection: "column", width: "100%", paddingTop: 24 }}>
+          <div style={{ display: "flex", fontSize: 72, fontWeight: 800, letterSpacing: -2.2, lineHeight: 1.1 }}>{title}</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 36, marginTop: 18 }}>
+            <img src={crestSrc(lead)} width={216} height={216} alt="" />
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               {rows.map((r) => (
-                <div key={r.rank} style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                  <span style={{ fontFamily: "Barlow Condensed", fontSize: 36, color: TEXT_3, width: 24 }}>{r.rank}</span>
-                  <span style={{ fontSize: 34, fontWeight: 800 }}>{r.name}</span>
-                  <span style={{ fontSize: 24, fontWeight: 500, color: TEXT_2 }}>{r.tier}</span>
-                  <span style={{ fontFamily: "Barlow Condensed", fontSize: 38 }}>{r.price}</span>
+                <div key={r.rank} style={{ display: "flex", alignItems: "center", gap: 18 }}>
+                  <span style={{ fontWeight: 800, fontSize: 40, color: TEXT_3, width: 30 }}>{r.rank}</span>
+                  <span style={{ fontSize: 40, fontWeight: 800, letterSpacing: -0.8 }}>{r.name}</span>
+                  <span style={{ fontSize: 28, fontWeight: 500, color: TEXT_2 }}>{r.tier}</span>
+                  <span style={{ fontWeight: 800, fontSize: 44, letterSpacing: -0.6 }}>{r.price}</span>
                 </div>
               ))}
             </div>
           </div>
-          <div style={{ display: "flex", gap: 22, marginTop: "auto" }}>
+          <div style={{ display: "flex", gap: 24, marginTop: "auto" }}>
             {counts.map(({ tier, n }) => (
-              <div key={tier.id} style={{ display: "flex", alignItems: "center", gap: 4, opacity: n ? 1 : 0.35 }}>
-                <img src={crestSrc(tier.id)} width={46} height={46} alt="" />
-                <span style={{ fontFamily: "Barlow Condensed", fontSize: 28, color: TEXT_2 }}>{n}</span>
+              <div key={tier.id} style={{ display: "flex", alignItems: "center", gap: 6, opacity: n ? 1 : 0.35 }}>
+                <img src={crestSrc(tier.id)} width={48} height={48} alt="" />
+                <span style={{ fontWeight: 800, fontSize: 30, color: TEXT_2 }}>{n}</span>
               </div>
             ))}
           </div>

@@ -7,7 +7,7 @@ import { TopBar } from "@/components/site/TopBar";
 import { REGIONS } from "@/data/regions";
 import { formatKoreanDate } from "@/lib/format/date";
 import { getLatestEdition } from "@/lib/queries";
-import { TIERS, type Tier } from "@/lib/stats/tiers";
+import { priceAtGeupji, TIERS, type Tier } from "@/lib/stats/tiers";
 import type { RegionSnapshot } from "@/lib/stats/snapshot";
 import styles from "./page.module.css";
 
@@ -57,7 +57,7 @@ export default async function RankingPage() {
         <section className={styles.section} aria-labelledby="flow-title">
           <header className="section-head">
             <h2 id="flow-title">순위 변동</h2>
-            <p>최근 12개월 월말 순위 · 선을 가리키면 그 단지만 보여요</p>
+            <p>월말 순위 · 1년은 달마다, 12년·20년은 해마다 · 선을 가리키면 그 단지만 보여요</p>
           </header>
           <RankFlow snapshots={edition.snapshots} regions={REGIONS} />
         </section>
@@ -79,7 +79,8 @@ export default async function RankingPage() {
 function Cutoff({ tier, snapshots }: { tier: Tier; snapshots: RegionSnapshot[] }) {
   const holders = snapshots.filter((s) => s.standing!.tier.id === tier.id).map((s) => s.rep!.priceManwon);
   const full = holders.length === tier.seats;
-  const cut = full ? Math.min(...holders) : tier.minManwon;
+  const anchor = snapshots[0]?.standing?.anchorManwon ?? 0;
+  const cut = full ? Math.min(...holders) : priceAtGeupji(tier.maxGeupji, anchor);
   return (
     <div className={styles.cutoff}>
       <dt>

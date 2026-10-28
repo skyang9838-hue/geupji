@@ -1,42 +1,48 @@
+/* Apple dark showroom: black canvas, flat #161617 tiles told apart by surface
+   alone (no borders, no shadows), one blue for anything you press. Tier colors
+   appear only in emblems, tier names and thin marks. */
+
 .head {
-  padding: 40px 0 18px;
+  padding: 72px 0 40px;
 }
 
 .head h1 {
-  font-size: clamp(28px, 4vw, 40px);
-  font-weight: 850;
-  letter-spacing: -0.03em;
+  font-size: clamp(44px, 6.4vw, 72px);
+  font-weight: 600;
+  line-height: 1.06;
+  letter-spacing: -0.022em;
 }
 
 .head p {
-  margin-top: 8px;
-  font-size: 14px;
-  color: var(--text-2);
-}
-
-.loading {
-  padding: 80px 0;
-  text-align: center;
+  margin-top: 14px;
+  font-size: clamp(19px, 1.8vw, 21px);
+  line-height: 1.4;
   color: var(--text-3);
 }
 
-/* ── the matchup card ───────────────────────────────────────── */
+.loading {
+  padding: 96px 0;
+  text-align: center;
+  font-size: 17px;
+  color: var(--text-3);
+}
+
+/* ── the matchup tile ───────────────────────────────────────── */
 
 .versus {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  gap: 20px;
-  padding: 22px 24px;
-  border: 1px solid var(--line);
-  border-radius: 16px;
+  gap: 32px;
+  padding: 44px 48px;
+  border-radius: var(--radius);
   background: var(--panel);
 }
 
 .side {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 24px;
   min-width: 0;
 }
 
@@ -47,84 +53,108 @@
 
 .sideCrest {
   flex: none;
-  filter: drop-shadow(0 8px 22px color-mix(in srgb, var(--c) 40%, transparent));
 }
 
 .side > div {
+  display: grid;
+  gap: 4px;
   min-width: 0;
-  padding-bottom: 2px;
-  border-bottom: 3px solid var(--s);
 }
 
 .sideArea {
-  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 17px;
   color: var(--text-3);
 }
 
+.sideRight .sideArea {
+  justify-content: flex-end;
+}
+
+/* the line color this side wears in the chart below */
+.sideArea::before {
+  content: "";
+  flex: none;
+  width: 16px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--s);
+}
+
+.sideRight .sideArea::before {
+  order: 1;
+}
+
+/* long names wrap rather than hide behind an ellipsis */
 .sideName {
-  overflow: hidden;
-  font-size: 22px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  font-size: clamp(28px, 2.6vw, 34px);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.022em;
+  overflow-wrap: anywhere;
 }
 
 .sideTier {
-  font-size: 13.5px;
+  font-size: 17px;
+  line-height: 1.45;
   color: var(--text-2);
 }
 
 .sidePrice {
-  font-size: 15px;
+  margin-top: 6px;
+  font-size: 21px;
   color: var(--text-2);
 }
 
 .sidePrice :global(.num) {
-  margin-right: 1px;
-  font-size: 34px;
+  margin-right: 2px;
+  font-size: clamp(44px, 4.4vw, 56px);
   font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.022em;
   color: var(--text);
 }
 
 .vs {
   display: grid;
   justify-items: center;
-  gap: 8px;
-  max-width: 260px;
+  gap: 10px;
+  max-width: 280px;
   text-align: center;
 }
 
 .vsMark {
   font-family: var(--font-num);
-  font-size: 44px;
-  font-weight: 700;
-  font-style: italic;
+  font-size: 40px;
+  font-weight: 600;
   line-height: 1;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.01em;
   color: var(--text-3);
 }
 
 .gap {
   display: grid;
-  gap: 2px;
-  font-size: 13px;
+  gap: 4px;
+  font-size: 17px;
+  line-height: 1.45;
   color: var(--text-2);
 }
 
 .gap b {
-  font-size: 20px;
+  font-size: 28px;
   font-weight: 600;
+  letter-spacing: -0.01em;
   color: var(--text);
 }
 
-/* ── cards ──────────────────────────────────────────────────── */
+/* ── tiles ──────────────────────────────────────────────────── */
 
 .card {
-  margin-top: 16px;
-  padding: 18px 20px 16px;
-  border: 1px solid var(--line);
-  border-radius: 14px;
+  margin-top: 20px;
+  padding: 36px 40px 32px;
+  border-radius: var(--radius);
   background: var(--panel);
 }
 
@@ -132,17 +162,19 @@
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: 4px 12px;
+  gap: 6px 16px;
 }
 
 .cardHead h2,
 .pickerTitle {
-  font-size: 16px;
-  font-weight: 750;
+  font-size: clamp(26px, 2.6vw, 32px);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.022em;
 }
 
 .cardHead p {
-  font-size: 12.5px;
+  font-size: 17px;
   color: var(--text-3);
 }
 
@@ -150,46 +182,59 @@
   list-style: none;
   display: flex;
   flex-wrap: wrap;
-  gap: 6px 16px;
-  margin: 10px 0 4px;
-  font-size: 13px;
+  gap: 8px 24px;
+  margin: 18px 0 12px;
+  font-size: 17px;
   color: var(--text-2);
 }
 
 .legend li {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .legend i {
   display: inline-block;
-  width: 14px;
-  height: 3px;
+  width: 18px;
+  height: 4px;
   border-radius: 2px;
 }
 
 .table {
   width: 100%;
-  font-size: 14px;
+  font-size: 17px;
 }
 
 .table th {
-  padding: 6px 8px 10px;
-  border-bottom: 1px solid var(--line);
-  font-size: 12.5px;
+  padding: 0 12px 14px;
+  border-bottom: 1px solid var(--line-2);
+  font-size: 15px;
   font-weight: 600;
   color: var(--text-3);
   text-align: left;
+  white-space: nowrap;
 }
 
 .table td {
-  padding: 10px 8px;
-  border-bottom: 1px solid var(--line);
+  padding: 18px 12px;
+  border-bottom: 1px solid var(--line-2);
+  vertical-align: middle;
+}
+
+.table th:first-child,
+.table td:first-child {
+  padding-left: 0;
+}
+
+.table th:last-child,
+.table td:last-child {
+  padding-right: 0;
 }
 
 .table tr:last-child td {
   border-bottom: 0;
+  padding-bottom: 4px;
 }
 
 .right {
@@ -198,104 +243,139 @@
 
 .swatch {
   display: inline-block;
-  width: 12px;
-  height: 3px;
-  margin-right: 8px;
+  width: 16px;
+  height: 4px;
+  margin-right: 10px;
   border-radius: 2px;
   vertical-align: middle;
 }
 
 .name {
-  font-weight: 650;
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--text);
 }
 
 .name:hover {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  color: var(--link);
 }
 
 .area {
-  margin-left: 8px;
-  font-size: 12.5px;
+  margin-left: 10px;
+  font-size: 15px;
   color: var(--text-3);
 }
 
 .tier {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-weight: 600;
   white-space: nowrap;
 }
 
+.tierInline {
+  display: none;
+}
+
 .big {
-  font-size: 18px;
+  font-size: 24px;
   font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* ── picker ─────────────────────────────────────────────────── */
+
+.pickerTitle {
+  margin-bottom: 20px;
 }
 
 .pickRow {
   display: grid;
-  grid-template-columns: 150px minmax(0, 1fr);
+  grid-template-columns: 170px minmax(0, 1fr);
   align-items: start;
-  gap: 12px;
-  padding: 10px 0;
-  border-top: 1px solid var(--line);
+  gap: 16px;
+  padding: 16px 0;
+  border-top: 1px solid var(--line-2);
 }
 
-.pickRow:first-of-type {
-  margin-top: 10px;
+.pickRow:last-child {
+  padding-bottom: 4px;
 }
 
 .pickTier {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding-top: 5px;
-  font-size: 13.5px;
-  font-weight: 650;
-  color: var(--text-2);
+  gap: 8px;
+  min-height: 44px;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--c);
 }
 
 .pickRow ul {
   list-style: none;
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 10px;
 }
 
+/* capsule controls: gray until chosen, Apple blue once chosen */
 .pick {
-  display: inline-block;
-  padding: 5px 12px;
-  border: 1px solid var(--line-2);
-  border-radius: 999px;
-  font-size: 13.5px;
-  color: var(--text-2);
-  transition: border-color 120ms ease, background-color 120ms ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 20px;
+  border-radius: 980px;
+  background: var(--panel-3);
+  font-size: 17px;
+  color: var(--text);
+  transition: background-color 120ms ease;
 }
 
 .pick:hover {
-  border-color: color-mix(in srgb, var(--c) 60%, var(--line-2));
-  color: var(--text);
+  background: var(--line-2);
 }
 
-.on {
-  border-color: var(--s);
-  background: color-mix(in srgb, var(--s) 22%, transparent);
-  color: var(--text);
-  font-weight: 650;
+.on,
+.on:hover {
+  background: var(--action);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* which chart line this pick drew */
+.pickDot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--s);
+  box-shadow: 0 0 0 2px #fff;
 }
 
 @media (max-width: 860px) {
   .versus {
     grid-template-columns: 1fr;
+    gap: 28px;
+    padding: 32px 28px;
   }
   .sideRight {
     flex-direction: row;
     text-align: left;
   }
+  .sideRight .sideArea {
+    justify-content: flex-start;
+  }
+  .sideRight .sideArea::before {
+    order: 0;
+  }
   .vs {
     justify-items: start;
     max-width: none;
+    padding: 20px 0;
+    border-block: 1px solid var(--line-2);
     text-align: left;
   }
   .vsMark {
@@ -304,9 +384,29 @@
 }
 
 @media (max-width: 720px) {
+  .head {
+    padding: 48px 0 28px;
+  }
+  .versus {
+    padding: 28px 20px;
+  }
+  .side {
+    gap: 16px;
+  }
+  .sideCrest {
+    width: 84px;
+    height: 84px;
+  }
+  .card {
+    margin-top: 16px;
+    padding: 28px 20px 24px;
+  }
   .pickRow {
     grid-template-columns: 1fr;
-    gap: 6px;
+    gap: 10px;
+  }
+  .pickTier {
+    min-height: 0;
   }
   .table th:nth-child(4),
   .table td:nth-child(4),
@@ -314,8 +414,25 @@
   .table td:nth-child(5) {
     display: none;
   }
+  .table td {
+    padding: 16px 8px;
+  }
   .area {
     display: block;
-    margin-left: 20px;
+    margin: 2px 0 0 26px;
+  }
+  .table th:nth-child(2),
+  .table td:nth-child(2) {
+    display: none;
+  }
+  .tierInline {
+    display: flex;
+    margin: 8px 0 0 26px;
+    font-size: 16px;
+    color: var(--text-2);
+  }
+  .big {
+    font-size: 21px;
+    white-space: nowrap;
   }
 }

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { scaleLinear } from "d3-scale";
 import { line } from "d3-shape";
 import { TIER_COLOR } from "@/lib/emblem/colors";
-import { TIERS, type TierLevel } from "@/lib/stats/tiers";
+import { TIERS, tierPriceRange, type TierLevel } from "@/lib/stats/tiers";
 import styles from "./TierGraph.module.css";
 
 const EOK = 10000;
@@ -27,17 +27,23 @@ export interface GraphTrade {
 export function TierGraph({
   points,
   trades,
+  anchorManwon,
   variant,
 }: {
   points: GraphPoint[];
   trades: GraphTrade[];
+  /** Today's Seoul anchor: the bands are drawn at today's 급지 prices. */
+  anchorManwon: number;
   variant: "wide" | "narrow";
 }) {
   const [hover, setHover] = useState<number | null>(null);
   const wide = variant === "wide";
-  const W = wide ? 760 : 360;
-  const H = wide ? 360 : 280;
-  const M = wide ? { top: 16, right: 108, bottom: 30, left: 46 } : { top: 14, right: 70, bottom: 28, left: 38 };
+  // Sized so the text lands at 15px+ on screen: the wide drawing renders at
+  // ~600–950px, the narrow one at ~320px.
+  const W = wide ? 680 : 360;
+  const H = wide ? 360 : 300;
+  const FS = wide ? 17.5 : 18;
+  const M = wide ? { top: 16, right: 112, bottom: 38, left: 54 } : { top: 14, right: 108, bottom: 36, left: 50 };
 
   const known = points.filter((p) => p.priceManwon !== null).map((p) => p.priceManwon!);
   if (known.length < 2) return <p className={styles.none}>그래프를 그릴 만큼 거래가 없어요</p>;
@@ -65,13 +71,30 @@ export function TierGraph({
   // tier bands crossing the visible range, bottom (iron) to top
   const bands = [...TIERS]
     .reverse()
-    .map((tier) => {
-      const top = tier.level === 0 ? Infinity : TIERS[tier.level - 1].minManwon;
-      return { tier, lo: Math.max(tier.minManwon, d0), hi: Math.min(top, d1) };
+    .flatMap((tier) => {
+      const range = tierPriceRange(tier, anchorManwon);
+      return range ? [{ tier, lo: Math.max(range.lo, d0), hi: Math.min(range.hi, d1) }] : [];
     })
     .filter((b) => b.hi > b.lo);
 
-  const years = points.map((p, i) => ({ p, i })).filter(({ p }) => p.ym.endsWith("01"));
+  // Band name tags on the right edge: centered on their band, pushed apart so
+  // no two overlap, and the thinnest bands dropped if they cannot all fit.
+  const gap = FS + 5;
+  const top = M.top + FS / 2;
+  const bottom = H - M.bottom - FS / 2;
+  let tags = bands.map((b) => ({ tier: b.tier, size: y(b.lo) - y(b.hi), at: (y(b.lo) + y(b.hi)) / 2 })).filter((t) => t.size >= 3);
+  while (tags.length > 1 && (tags.length - 1) * gap > bottom - top) {
+    const thinnest = tags.reduce((a, b) => (b.size < a.size ? b : a));
+    tags = tags.filter((t) => t !== thinnest);
+  }
+  tags.sort((a, b) => a.at - b.at);
+  tags.forEach((t, i) => (t.at = Math.max(t.at, top, i > 0 ? tags[i - 1].at + gap : -Infinity)));
+  for (let i = tags.length - 1; i >= 0; i--) tags[i].at = Math.min(tags[i].at, bottom, i < tags.length - 1 ? tags[i + 1].at - gap : Infinity);
+
+  // one tick per January, thinned on long spans so labels never touch (≤8 wide, ≤5 narrow)
+  const januaries = points.map((p, i) => ({ p, i })).filter(({ p }) => p.ym.endsWith("01"));
+  const every = Math.ceil(januaries.length / (wide ? 8 : 5));
+  const years = januaries.filter((_, k) => (januaries.length - 1 - k) % every === 0);
   const nowPoint = [...points].reverse().find((p) => p.priceManwon !== null)!;
   const nowIndex = points.lastIndexOf(nowPoint);
   const h = hover === null ? null : points[hover];
@@ -81,6 +104,7 @@ export function TierGraph({
       <svg
         viewBox={`0 0 ${W} ${H}`}
         className={styles.svg}
+        style={{ fontSize: FS }}
         role="img"
         aria-label="월말 대표가와 티어 구간"
         onPointerMove={(e) => {
@@ -99,29 +123,29 @@ export function TierGraph({
               width={W - M.left - M.right}
               height={y(bLo) - y(bHi)}
               fill={TIER_COLOR[tier.id]}
-              opacity={tier.level % 2 === 0 ? 0.07 : 0.035}
+              opacity={tier.level % 2 === 0 ? 0.045 : 0.025}
             />
-            {bLo > d0 && <line x1={M.left} x2={W - M.right} y1={y(bLo)} y2={y(bLo)} stroke={TIER_COLOR[tier.id]} strokeOpacity={0.35} />}
-            {y(bLo) - y(bHi) > 14 && (
-              <g transform={`translate(${W - M.right + 10}, ${(y(bLo) + y(bHi)) / 2})`}>
-                <rect x={0} y={-6} width={3} height={12} rx={1.5} fill={TIER_COLOR[tier.id]} />
-                <text x={9} dominantBaseline="middle" className={styles.band}>
-                  {tier.name}
-                </text>
-              </g>
-            )}
+            {bLo > d0 && <line x1={M.left} x2={W - M.right} y1={y(bLo)} y2={y(bLo)} stroke={TIER_COLOR[tier.id]} strokeOpacity={0.3} />}
+          </g>
+        ))}
+        {tags.map(({ tier, at }) => (
+          <g key={tier.id} transform={`translate(${W - M.right + 10}, ${at})`}>
+            <rect x={0} y={-7} width={3} height={14} rx={1.5} fill={TIER_COLOR[tier.id]} />
+            <text x={10} dominantBaseline="central" className={styles.band}>
+              {tier.name}
+            </text>
           </g>
         ))}
 
         {y.ticks(5).map((v) => (
-          <text key={v} x={M.left - 8} y={y(v)} textAnchor="end" dominantBaseline="middle" className={styles.tick}>
+          <text key={v} x={M.left - 10} y={y(v)} textAnchor="end" dominantBaseline="central" className={styles.tick}>
             {v / EOK}억
           </text>
         ))}
         {years.map(({ p, i }) => (
           <g key={p.ym}>
             <line x1={x(i)} x2={x(i)} y1={M.top} y2={H - M.bottom} className={styles.grid} />
-            <text x={x(i)} y={H - 8} textAnchor="middle" className={styles.tick}>
+            <text x={x(i)} y={H - 10} textAnchor="middle" className={styles.tick}>
               {wide ? `${p.ym.slice(0, 4)}년` : `’${p.ym.slice(2, 4)}`}
             </text>
           </g>
@@ -132,14 +156,14 @@ export function TierGraph({
             key={i}
             cx={dayX(t.dealDate)}
             cy={y(t.priceManwon)}
-            r={wide ? 2.6 : 2.2}
+            r={wide ? 3 : 2.6}
             className={styles.deal}
           />
         ))}
 
         <path d={path!} className={styles.line} />
 
-        <circle cx={x(nowIndex)} cy={y(nowPoint.priceManwon!)} r={5} className={styles.now} />
+        <circle cx={x(nowIndex)} cy={y(nowPoint.priceManwon!)} r={6} className={styles.now} />
 
         {h && h.priceManwon !== null && (
           <g pointerEvents="none">

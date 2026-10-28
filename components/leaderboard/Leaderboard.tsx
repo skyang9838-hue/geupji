@@ -4,7 +4,7 @@ import { Sparkline } from "@/components/charts/Sparkline";
 import { TierEmblem } from "@/components/emblem/TierEmblem";
 import type { RegionDef } from "@/data/regions";
 import { formatChange, formatPercent } from "@/lib/format/price";
-import { formatLp, formatTier } from "@/lib/format/tier";
+import { formatGeupji, formatLp, formatTier } from "@/lib/format/tier";
 import type { EditionEvent } from "@/lib/stats/events";
 import type { RegionSnapshot } from "@/lib/stats/snapshot";
 import styles from "./Leaderboard.module.css";
@@ -75,7 +75,7 @@ export function Leaderboard({
                     </span>
                   )}
                 </td>
-                <td>
+                <td className={styles.nameCell}>
                   <Link href={`/r/${region.slug}`} className={styles.name}>
                     {s.leader?.name}
                   </Link>
@@ -83,13 +83,16 @@ export function Leaderboard({
                     {region.name} · {region.area}
                   </span>
                   <span className={styles.mTier}>
-                    <TierEmblem tier={st.tier.id} size={18} />
-                    {formatTier(st)} · <span className="num">{formatLp(st)}</span>
+                    <TierEmblem tier={st.tier.id} size={22} />
+                    <span>
+                      {formatTier(st)} · <span className="num">{formatGeupji(st)}</span>
+                    </span>
                     {tierMove && (
                       <span className={`${styles.badge} ${tierMove === "TIER_UP" ? styles.promo : styles.demo}`}>
                         {tierMove === "TIER_UP" ? "승급" : "강등"}
                       </span>
                     )}
+                    <span className={`${styles.mLp} num`}>{formatLp(st)}</span>
                   </span>
                 </td>
                 <td className={styles.tierCol}>
@@ -104,11 +107,13 @@ export function Leaderboard({
                           </span>
                         )}
                       </span>
-                      <span className={`${styles.lp} num`}>{formatLp(st)}</span>
+                      <span className={`${styles.lp} num`}>
+                        {formatGeupji(st)} · {formatLp(st)}
+                      </span>
                     </span>
                   </span>
                 </td>
-                <td className={styles.right}>
+                <td className={`${styles.right} ${styles.priceCell}`}>
                   <span className={styles.price}>
                     <span className="num">{(s.rep!.priceManwon / EOK).toFixed(2)}</span>억
                   </span>
