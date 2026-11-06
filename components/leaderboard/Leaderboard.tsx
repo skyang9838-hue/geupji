@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 import { Sparkline } from "@/components/charts/Sparkline";
 import { TierEmblem } from "@/components/emblem/TierEmblem";
-import type { RegionDef } from "@/data/regions";
+import { areaLabel, type RegionDef } from "@/data/regions";
 import { formatChange, formatPercent } from "@/lib/format/price";
 import { formatGeupji, formatLp, formatTier } from "@/lib/format/tier";
 import type { EditionEvent } from "@/lib/stats/events";
@@ -77,10 +77,11 @@ export function Leaderboard({
                 </td>
                 <td className={styles.nameCell}>
                   <Link href={`/r/${region.slug}`} className={styles.name}>
-                    {s.leader?.name}
+                    {region.name}
                   </Link>
                   <span className={styles.area}>
-                    {region.name} · {region.area}
+                    {s.leader?.name ? `${s.leader.name} · ` : ""}
+                    {areaLabel(region)}
                   </span>
                   <span className={styles.mTier}>
                     <TierEmblem tier={st.tier.id} size={22} />

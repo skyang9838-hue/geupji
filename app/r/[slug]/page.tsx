@@ -7,7 +7,7 @@ import { sampleSpan, SpanPicker, type Span } from "@/components/span/SpanPicker"
 import { TierEmblem } from "@/components/emblem/TierEmblem";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { TopBar } from "@/components/site/TopBar";
-import { REGIONS, regionBySlug } from "@/data/regions";
+import { areaLabel, REGIONS, regionBySlug } from "@/data/regions";
 import { formatKoreanDate } from "@/lib/format/date";
 import { formatChange, formatEok, formatKoreanPrice, formatPercent } from "@/lib/format/price";
 import { formatClimb, formatGeupji, formatLp, formatTier, geupjiLabel, romanDivision } from "@/lib/format/tier";
@@ -84,9 +84,9 @@ export default async function ApartmentPage({ params }: PageProps<"/r/[slug]">) 
           </p>
           <TierEmblem tier={st.tier.id} size={200} className={styles.crest} />
           <p className={styles.eyebrow}>{formatTier(st)}</p>
-          <h1 className={styles.name}>{snap.leader.name}</h1>
+          <h1 className={styles.name}>{region.name}</h1>
           <p className={styles.meta}>
-            {region.name} · {region.area}
+            {snap.leader.name} · {areaLabel(region)}
             {snap.leader.buildYear ? ` · ${snap.leader.buildYear}년 준공` : ""}
           </p>
           <dl className={styles.figures}>

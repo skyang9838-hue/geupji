@@ -75,3 +75,47 @@ export async function getComplexTrades(aptSeq: string): Promise<TradeView[]> {
     removed: r.removedAt !== null,
   }));
 }
+
+export interface ComplexHit {
+  aptSeq: string;
+  name: string;
+  umdName: string;
+  sggCd: string;
+  buildYear: number | null;
+  /** Trades in the last year: busy complexes come first. */
+  recent: number;
+}
+
+/** "내 아파트" search: complexes whose name holds the words, spaces ignored. */
+export async function searchComplexes(query: string, asOf: string): Promise<ComplexHit[]> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag(EDITION_TAG);
+
+  const needle = query.replace(/\s+/g, "");
+  if (needle.length < 2) return [];
+  const pattern = `%${needle.replace(/[\\%_]/g, (c) => `\\${c}`)}%`;
+  const since = new Date(`${asOf}T00:00:00Z`);
+  since.setUTCFullYear(since.getUTCFullYear() - 1);
+  const rows = await prisma.$queryRaw<Array<Omit<ComplexHit, "recent"> & { recent: bigint }>>`
+    SELECT c."aptSeq", c."name", c."umdName", c."sggCd", c."buildYear",
+           COUNT(t."id") FILTER (WHERE t."dealDate" >= ${since}) AS recent
+    FROM "Complex" c
+    LEFT JOIN "Trade" t ON t."aptSeq" = c."aptSeq"
+    WHERE REPLACE(c."name", ' ', '') ILIKE ${pattern}
+    GROUP BY c."aptSeq"
+    ORDER BY recent DESC, c."name"
+    LIMIT 20`;
+  return rows.map((r) => ({ ...r, recent: Number(r.recent) }));
+}
+
+export async function getComplex(aptSeq: string) {
+  "use cache";
+  cacheLife("hours");
+  cacheTag(EDITION_TAG);
+
+  return prisma.complex.findUnique({
+    where: { aptSeq },
+    select: { aptSeq: true, name: true, umdName: true, sggCd: true, buildYear: true },
+  });
+}

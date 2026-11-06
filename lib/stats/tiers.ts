@@ -129,7 +129,7 @@ function place(tier: Tier, g: number, anchorManwon: number): { division: Divisio
   return { division: (4 - steps) as Division, lp, nextFloor: priceAtGeupji(floor - width, anchorManwon) };
 }
 
-interface Entry {
+export interface LadderEntry {
   key: string;
   priceManwon: number | null;
   /** A Seoul region that sets 급지 1.0. */
@@ -147,12 +147,12 @@ interface Entry {
  * the tier of their 급지. With no entry flagged, first place inside master's
  * bound takes the one challenger seat instead. Ranks run by tier, then price.
  */
-export function rankStandings(entries: Entry[]): Map<string, Standing> {
+export function rankStandings(entries: LadderEntry[]): Map<string, Standing> {
   const out = new Map<string, Standing>();
   const anchorManwon = anchorPrice(entries);
   if (anchorManwon === null) return out;
   const byPrice = entries
-    .filter((e): e is Entry & { priceManwon: number } => e.priceManwon !== null && e.priceManwon > 0)
+    .filter((e): e is LadderEntry & { priceManwon: number } => e.priceManwon !== null && e.priceManwon > 0)
     .sort((a, b) => b.priceManwon - a.priceManwon || a.key.localeCompare(b.key));
 
   const flagged = entries.some((e) => e.challenger);

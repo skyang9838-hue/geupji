@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { TierEmblem } from "@/components/emblem/TierEmblem";
-import { CHALLENGER_NAMES, type RegionDef } from "@/data/regions";
+import { areaLabel, CHALLENGER_NAMES, type RegionDef } from "@/data/regions";
 import { formatChange } from "@/lib/format/price";
 import { geupjiLabel, romanDivision } from "@/lib/format/tier";
 import type { RegionSnapshot } from "@/lib/stats/snapshot";
@@ -42,11 +42,12 @@ export function TierBoard({ snapshots, regions }: { snapshots: RegionSnapshot[];
                     <li key={s.regionSlug}>
                       <Link href={`/r/${region.slug}`} className={styles.chip}>
                         <span className={`${styles.rank} num`}>{st.rank}</span>
-                        <span className={styles.name}>{s.leader?.name ?? region.name}</span>
+                        <span className={styles.name}>{region.name}</span>
                         <span className={`${styles.step} num`}>{st.division ? `${romanDivision(st.division)} · ` : ""}
                           {geupjiLabel(st.geupji)}</span>
                         <span className={styles.area}>
-                          {region.name} · {region.area}
+                          {s.leader?.name ? `${s.leader.name} · ` : ""}
+                          {areaLabel(region)}
                         </span>
                         <span className={styles.price}>
                           <span className="num">{(s.rep!.priceManwon / EOK).toFixed(2)}</span>억

@@ -231,6 +231,15 @@ export function isChallengerRegion(region: RegionDef): boolean {
 /** "반포·대치·개포·성수" for the rule text. */
 export const CHALLENGER_NAMES = CHALLENGER_SLUGS.map((s) => regionBySlug(s)!.name).join("·");
 
+/**
+ * The area line without repeating the region's own name:
+ * 대전 + "대전 유성구·서구" → "유성구·서구". Others stay as they are.
+ */
+export function areaLabel(region: RegionDef): string {
+  const prefix = `${region.name} `;
+  return region.area.startsWith(prefix) ? region.area.slice(prefix.length) : region.area;
+}
+
 export function regionBySlug(slug: string): RegionDef | undefined {
   return REGIONS.find((r) => r.slug === slug);
 }

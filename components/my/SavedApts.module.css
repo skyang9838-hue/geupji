@@ -1,0 +1,55 @@
+.star {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: var(--panel-3);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
+  transition: background-color 140ms ease;
+}
+
+.star:hover {
+  background: var(--line-2);
+}
+
+.star[aria-pressed="true"] span {
+  color: var(--t-challenger);
+}
+
+.saved {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.label {
+  font-size: 16px;
+  color: var(--text-3);
+}
+
+.saved ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.saved a {
+  display: block;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: var(--panel-2);
+  font-size: 16px;
+  color: var(--text-2);
+}
+
+.saved a:hover,
+.saved a[aria-current="page"] {
+  background: var(--panel-3);
+  color: var(--text);
+}
