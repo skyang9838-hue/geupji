@@ -3,6 +3,7 @@ import type { CSSProperties } from "react";
 import { TierEmblem } from "@/components/emblem/TierEmblem";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { TopBar } from "@/components/site/TopBar";
+import { CHALLENGER_NAMES } from "@/data/regions";
 import { getLatestEdition } from "@/lib/queries";
 import { TIERS, type Tier } from "@/lib/stats/tiers";
 import styles from "./page.module.css";
@@ -74,7 +75,7 @@ export default async function AboutPage() {
             <div>
               <dt>챌린저·그랜드마스터</dt>
               <dd>
-                챌린저는 강남 3구(강남·서초·송파) 지역이에요. 가격과 상관없이 늘 챌린저예요. 그랜드마스터는 그 밖의
+                챌린저는 직접 고른 네 곳({CHALLENGER_NAMES})이에요. 가격과 상관없이 늘 챌린저예요. 그랜드마스터는 그 밖의
                 지역 중 가격 순서로 두 자리이고, 2.1급지 이내일 때만 앉아요. 값이 되어도 자리가 차 있으면 마스터에
                 머물러요. 순위는 티어가 먼저, 같은 티어 안에서는 가격 순이에요.
               </dd>
@@ -117,7 +118,7 @@ export default async function AboutPage() {
 
 function rule(tier: Tier): string {
   const worst = tier.maxGeupji.toFixed(1);
-  if (tier.id === "challenger") return "강남 3구 (강남·서초·송파) · 가격과 상관없이";
+  if (tier.id === "challenger") return `${CHALLENGER_NAMES} · 가격과 상관없이`;
   if (tier.id === "grandmaster") return `그다음 두 자리 · ${worst}급지 이내일 때`;
   if (tier.id === "master") return `${worst}급지 이내 · 디비전 없음`;
   const best = TIERS[tier.level - 1].maxGeupji.toFixed(1);

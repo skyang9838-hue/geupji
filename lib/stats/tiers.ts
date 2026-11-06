@@ -27,8 +27,8 @@ export interface Tier {
   maxGeupji: number;
   /**
    * Apex seats held by rank, as League limits challenger and grandmaster.
-   * Challenger has one seat only when no 강남 3구 region is flagged; with them,
-   * every 강남 3구 region is challenger (see `rankStandings`).
+   * Challenger has one seat only when no region is flagged challenger; with
+   * them, every flagged region is challenger (see `rankStandings`).
    */
   seats?: number;
 }
@@ -38,7 +38,7 @@ export interface Tier {
  * each price becomes a 급지 against the Seoul anchor (see `geupji`), and the
  * bounds below are in 급지. Change them only here.
  *
- * 2026-11-06: 강남 3구 took challenger as a block, so every bound below moved
+ * 2026-11-06: hand-picked regions (반포·대치·개포·성수) took challenger as a block, so every bound below moved
  * down one tier (master 1.7 → 2.1, …, bronze 4.0 → 4.4).
  */
 export const TIERS: readonly Tier[] = [
@@ -134,7 +134,7 @@ interface Entry {
   priceManwon: number | null;
   /** A Seoul region that sets 급지 1.0. */
   anchor?: boolean;
-  /** A 강남 3구 region: challenger whatever its price. */
+  /** A hand-picked challenger region: challenger whatever its price. */
   challenger?: boolean;
 }
 
@@ -142,7 +142,7 @@ interface Entry {
  * Rank every priced entry and give it a 급지, tier, division and LP. 급지 is
  * measured against the mean of the top Seoul (anchor) prices.
  *
- * Every 강남 3구 (challenger-flagged) entry is challenger. The next two by
+ * Every challenger-flagged entry is challenger. The next two by
  * price inside master's bound take the grandmaster seats; everyone else earns
  * the tier of their 급지. With no entry flagged, first place inside master's
  * bound takes the one challenger seat instead. Ranks run by tier, then price.
@@ -180,7 +180,7 @@ export function rankStandings(entries: Entry[]): Map<string, Standing> {
     const { tier, g, priceManwon: price } = e;
     const base = { rank: i + 1, tier, geupji: g, anchorManwon };
     if (tier.level <= MASTER.level) {
-      // With 강남 3구 seated, no price earns challenger: a grandmaster climbs to the grandmaster above.
+      // With challengers picked by hand, no price earns challenger: a grandmaster climbs to the grandmaster above.
       const gmAbove = flagged ? gms.filter((p) => p > price).at(-1) : throne;
       const target = tier === CHALLENGER ? undefined : tier === GRANDMASTER ? gmAbove : (gms.at(-1) ?? throne);
       const lp = Math.max(0, Math.floor((price - masterFloor) / APEX_LP_STEP));

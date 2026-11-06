@@ -135,7 +135,7 @@ describe("rankStandings", () => {
     }
   });
 
-  it("with no 강남 3구 flagged, seats one challenger and two grandmasters inside 2.1급지; the rest there stay master", () => {
+  it("with no challenger flagged, seats one challenger and two grandmasters inside 2.1급지; the rest there stay master", () => {
     const s = standings({ a: 50, b: 45, c: 42, d: 40 });
 
     expect(["a", "b", "c", "d"].map((k) => s.get(k)?.tier.id)).toEqual([
@@ -191,34 +191,34 @@ describe("rankStandings", () => {
   });
 });
 
-describe("rankStandings with 강남 3구", () => {
-  // 2026-09 real prices: 성수 sits above 대치·개포·잠실 by price
+describe("rankStandings with hand-picked challengers", () => {
+  // 2026-09 real prices: 잠실 is now below the picked four
   const PRICES = { banpo: 58.5, seongsu: 46.5, daechi: 43.45, gaepo: 37.1, jamsil: 34.9, gangdong: 30, yongsan: 28 };
   const SEOUL = Object.keys(PRICES);
-  const G3 = ["banpo", "daechi", "gaepo", "jamsil"];
+  const G3 = ["banpo", "daechi", "gaepo", "seongsu"];
   const s = () => standings(PRICES, SEOUL, G3);
 
-  it("makes every 강남 3구 region challenger, whatever its price", () => {
+  it("makes every flagged region challenger, whatever its price", () => {
     expect(G3.map((k) => s().get(k)?.tier.id)).toEqual(["challenger", "challenger", "challenger", "challenger"]);
   });
 
-  it("keeps a 강남 3구 region challenger even far down the ladder", () => {
+  it("keeps a flagged region challenger even far down the ladder", () => {
     expect(standings({ banpo: 50, jamsil: 10 }, ["banpo"], ["banpo", "jamsil"]).get("jamsil")?.tier.id).toBe("challenger");
   });
 
-  it("never seats a region outside 강남 3구 as challenger; the next two by price take grandmaster", () => {
-    expect(["seongsu", "gangdong", "yongsan"].map((k) => s().get(k)?.tier.id)).toEqual(["grandmaster", "grandmaster", "master"]);
+  it("never seats an unflagged region as challenger; the next two by price take grandmaster", () => {
+    expect(["jamsil", "gangdong", "yongsan"].map((k) => s().get(k)?.tier.id)).toEqual(["grandmaster", "grandmaster", "master"]);
   });
 
   it("ranks by tier first, then price", () => {
-    expect(["banpo", "daechi", "gaepo", "jamsil", "seongsu", "gangdong", "yongsan"].map((k) => s().get(k)?.rank)).toEqual([
+    expect(["banpo", "seongsu", "daechi", "gaepo", "jamsil", "gangdong", "yongsan"].map((k) => s().get(k)?.rank)).toEqual([
       1, 2, 3, 4, 5, 6, 7,
     ]);
   });
 
   it("has a grandmaster climb to the grandmaster above, and nothing for the top one", () => {
-    expect(s().get("seongsu")?.toNext).toBeNull();
-    expect(s().get("gangdong")?.toNext).toBe(465000 - 300000);
+    expect(s().get("jamsil")?.toNext).toBeNull();
+    expect(s().get("gangdong")?.toNext).toBe(349000 - 300000);
     expect(s().get("yongsan")?.toNext).toBe(300000 - 280000);
   });
 

@@ -6,7 +6,7 @@ import { rankStandings, type Standing } from "./tiers";
  * of their history (the ladder), and at the close of every year (seasons,
  * the current year's season still running). `anchors` are the Seoul regions
  * that set 급지 1.0; without them every region counts. `challengers` are the
- * 강남 3구 regions, challenger whatever their price.
+ * hand-picked challenger regions, challenger whatever their price.
  */
 export function rankEdition(
   facts: RegionFacts[],

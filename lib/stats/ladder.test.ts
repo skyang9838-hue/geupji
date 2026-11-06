@@ -24,7 +24,7 @@ describe("rankEdition", () => {
     expect(songdo.standing).toMatchObject({ rank: 2, tier: { id: "gold" } });
   });
 
-  it("seats every 강남 3구 region as challenger, month by month too", () => {
+  it("seats every flagged region as challenger, month by month too", () => {
     const [banpo, seongsu, jamsil] = rankEdition(
       [facts("banpo", 58, { "202601": 58 }), facts("seongsu", 46, { "202601": 46 }), facts("jamsil", 35, { "202601": 35 })],
       new Set(["banpo", "seongsu", "jamsil"]),

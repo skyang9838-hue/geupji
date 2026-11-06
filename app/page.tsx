@@ -78,7 +78,7 @@ export default async function RankingPage() {
 /** op.gg-style cutoff: what it takes to sit in a seated tier today. */
 function Cutoff({ tier, snapshots }: { tier: Tier; snapshots: RegionSnapshot[] }) {
   const holders = snapshots.filter((s) => s.standing!.tier.id === tier.id).map((s) => s.rep!.priceManwon);
-  // 강남 3구 hold challenger as a block, so its count can pass the one seat
+  // hand-picked regions hold challenger as a block, so its count can pass the one seat
   const block = tier.id === "challenger" && holders.length > tier.seats!;
   const full = block || holders.length === tier.seats;
   const anchor = snapshots[0]?.standing?.anchorManwon ?? 0;
@@ -92,7 +92,7 @@ function Cutoff({ tier, snapshots }: { tier: Tier; snapshots: RegionSnapshot[] }
       <dd>
         <span className="num">{(cut / EOK).toFixed(2)}</span>억
         <small>
-          {block ? `강남 3구 ${holders.length}곳` : `${tier.seats}자리 ${full ? "· 만석" : `중 ${holders.length}자리 찼음`}`}
+          {block ? `지정 ${holders.length}곳` : `${tier.seats}자리 ${full ? "· 만석" : `중 ${holders.length}자리 찼음`}`}
         </small>
       </dd>
     </div>

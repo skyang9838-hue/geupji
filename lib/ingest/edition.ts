@@ -1,5 +1,5 @@
 import { Prisma, type Edition, type PrismaClient } from "@/generated/prisma/client";
-import { isGangnam3, type RegionDef } from "@/data/regions";
+import { isChallengerRegion, type RegionDef } from "@/data/regions";
 import { cancellationEvents, tierEvents, tradeEvents, type EditionEvent } from "@/lib/stats/events";
 import { BASE_BAND, shiftDate, type StatTrade } from "@/lib/stats/representative";
 import { rankEdition } from "@/lib/stats/ladder";
@@ -90,7 +90,7 @@ export async function publishEdition(
   const snapshots = rankEdition(
     facts,
     new Set(regions.filter((r) => r.sido === "서울").map((r) => r.slug)),
-    new Set(regions.filter(isGangnam3).map((r) => r.slug)),
+    new Set(regions.filter(isChallengerRegion).map((r) => r.slug)),
   );
 
   const existing = await db.edition.findUnique({ where: { asOf: asOfDate } });

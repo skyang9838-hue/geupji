@@ -165,12 +165,18 @@ export const REGIONS: RegionDef[] = [
   { slug: "jakjeon", name: "작전", area: "인천 계양구", sido: "인천", districts: [{ code: "28245" }], dongs: ["작전동", "서운동"] },
 ];
 
-/** 강남 3구: every region here is challenger, whatever its price (사용자 2026-11-06). */
-export const CHALLENGER_AREAS = ["서울 강남구", "서울 서초구", "서울 송파구"] as const;
+/**
+ * Challenger regions, picked by hand: challenger whatever their price.
+ * 2026-11-06 사용자: 강남 3구로 시작했다가 잠실을 내리고 성수(트리마제)를 올림.
+ */
+export const CHALLENGER_SLUGS = ["banpo", "daechi", "gaepo", "seongsu"] as const;
 
-export function isGangnam3(region: RegionDef): boolean {
-  return (CHALLENGER_AREAS as readonly string[]).includes(region.area);
+export function isChallengerRegion(region: RegionDef): boolean {
+  return (CHALLENGER_SLUGS as readonly string[]).includes(region.slug);
 }
+
+/** "반포·대치·개포·성수" for the rule text. */
+export const CHALLENGER_NAMES = CHALLENGER_SLUGS.map((s) => regionBySlug(s)!.name).join("·");
 
 export function regionBySlug(slug: string): RegionDef | undefined {
   return REGIONS.find((r) => r.slug === slug);

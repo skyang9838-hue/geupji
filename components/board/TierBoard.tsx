@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { TierEmblem } from "@/components/emblem/TierEmblem";
-import type { RegionDef } from "@/data/regions";
+import { CHALLENGER_NAMES, type RegionDef } from "@/data/regions";
 import { formatChange } from "@/lib/format/price";
 import { geupjiLabel, romanDivision } from "@/lib/format/tier";
 import type { RegionSnapshot } from "@/lib/stats/snapshot";
@@ -73,7 +73,7 @@ export function TierBoard({ snapshots, regions }: { snapshots: RegionSnapshot[];
 
 function rule(tier: Tier): string {
   const worst = tier.maxGeupji.toFixed(1);
-  if (tier.id === "challenger") return "강남 3구";
+  if (tier.id === "challenger") return CHALLENGER_NAMES;
   if (tier.seats) return `${tier.seats}자리 · ${worst}급지 이내`;
   const best = TIERS[tier.level - 1].maxGeupji.toFixed(1);
   if (tier.id === "iron") return `${best}급지 넘음`;
