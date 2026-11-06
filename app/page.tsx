@@ -39,10 +39,10 @@ export default async function RankingPage() {
         <section className={styles.hero} aria-labelledby="title">
           <div>
             <h1 id="title" className={styles.title}>
-              수도권 대장아파트 티어
+              대장아파트 티어
             </h1>
             <p className={styles.lede}>
-              대장 단지의 전용 84㎡ 실거래 대표가로 매긴 롤 티어예요. {ranked.length}곳 ·{" "}
+              수도권과 대전·대구 수성·부산 해운대 대장 단지의 전용 84㎡ 실거래 대표가로 매긴 롤 티어예요. {ranked.length}곳 ·{" "}
               {formatKoreanDate(edition.asOf)} 실거래 기준
             </p>
           </div>

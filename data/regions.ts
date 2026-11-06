@@ -18,7 +18,7 @@ export interface RegionDef {
   name: string;
   /** Where it is, for the kicker line: "서울 송파구" */
   area: string;
-  sido: "서울" | "경기" | "인천";
+  sido: "서울" | "경기" | "인천" | "대전" | "대구" | "부산";
   districts: DistrictCode[];
   /** 법정동 names that make up the region. Old names stay listed so history still matches. */
   dongs: string[];
@@ -137,6 +137,46 @@ export const REGIONS: RegionDef[] = [
     districts: [{ code: "41285" }, { code: "41287" }],
     dongs: ["장항동", "마두동", "백석동", "정발산동", "주엽동", "대화동", "일산동", "탄현동"],
   },
+  // 2026-11-06 추가: 빈 티어(실버·브론즈·아이언)를 채우려고
+  {
+    slug: "samsong",
+    name: "삼송",
+    area: "고양 덕양구",
+    sido: "경기",
+    districts: [{ code: "41281" }],
+    dongs: ["삼송동", "동산동", "지축동", "원흥동", "향동동"],
+  },
+  { slug: "guri", name: "구리", area: "구리시", sido: "경기", districts: [{ code: "41310" }], dongs: ["인창동", "수택동", "교문동", "갈매동"] },
+  { slug: "dasan", name: "다산", area: "남양주시", sido: "경기", districts: [{ code: "41360" }], dongs: ["다산동"] },
+  { slug: "byeollae", name: "별내", area: "남양주시", sido: "경기", districts: [{ code: "41360" }], dongs: ["별내동"] },
+  { slug: "giheung", name: "기흥역", area: "용인 기흥구", sido: "경기", districts: [{ code: "41463" }], dongs: ["구갈동", "신갈동", "중동", "영덕동"] },
+  { slug: "hwajeong", name: "화정", area: "고양 덕양구", sido: "경기", districts: [{ code: "41281" }], dongs: ["화정동", "행신동"] },
+  {
+    slug: "uiwang",
+    name: "의왕",
+    area: "의왕시",
+    sido: "경기",
+    districts: [{ code: "41430" }],
+    dongs: ["포일동", "내손동", "학의동", "오전동"],
+  },
+  { slug: "jangan", name: "수원 장안", area: "수원 장안구", sido: "경기", districts: [{ code: "41111" }], dongs: ["정자동", "천천동", "조원동"] },
+  { slug: "gwonseon", name: "수원 권선", area: "수원 권선구", sido: "경기", districts: [{ code: "41113" }], dongs: ["권선동", "세류동", "호매실동", "금곡동"] },
+  { slug: "ansan", name: "안산", area: "안산 단원구", sido: "경기", districts: [{ code: "41273" }], dongs: ["고잔동", "초지동"] },
+  { slug: "anyang", name: "안양 만안", area: "안양 만안구", sido: "경기", districts: [{ code: "41171" }], dongs: ["안양동", "석수동", "박달동"] },
+  { slug: "sanbon", name: "산본", area: "군포시", sido: "경기", districts: [{ code: "41410" }], dongs: ["산본동", "금정동"] },
+  {
+    slug: "unjeong",
+    name: "운정",
+    area: "파주시",
+    sido: "경기",
+    districts: [{ code: "41480" }],
+    dongs: ["와동동", "목동동", "야당동", "동패동", "다율동", "당하동"],
+  },
+  { slug: "gimpo", name: "김포 한강", area: "김포시", sido: "경기", districts: [{ code: "41570" }], dongs: ["장기동", "구래동", "마산동", "운양동"] },
+  { slug: "godeok", name: "고덕", area: "평택시", sido: "경기", districts: [{ code: "41220" }], dongs: ["고덕동"] },
+  { slug: "baegot", name: "배곧", area: "시흥시", sido: "경기", districts: [{ code: "41390" }], dongs: ["배곧동"] },
+  { slug: "uijeongbu", name: "의정부", area: "의정부시", sido: "경기", districts: [{ code: "41150" }], dongs: ["의정부동", "민락동", "금오동", "용현동"] },
+  { slug: "okjeong", name: "옥정", area: "양주시", sido: "경기", districts: [{ code: "41630" }], dongs: ["옥정동", "회천동"] },
 
   // ── 인천 ───────────────────────────────────────────
   { slug: "songdo", name: "송도", area: "인천 연수구", sido: "인천", districts: [{ code: "28185" }], dongs: ["송도동"] },
@@ -163,6 +203,19 @@ export const REGIONS: RegionDef[] = [
     dongs: ["당하동", "원당동", "마전동", "불로동", "오류동", "왕길동", "백석동"],
   },
   { slug: "jakjeon", name: "작전", area: "인천 계양구", sido: "인천", districts: [{ code: "28245" }], dongs: ["작전동", "서운동"] },
+  { slug: "bupyeong", name: "부평", area: "인천 부평구", sido: "인천", districts: [{ code: "28237" }], dongs: ["부평동", "산곡동", "청천동", "십정동"] },
+
+  // ── 지방 (사용자 2026-11-06: 대전·대구 수성·부산 해운대만) ──
+  {
+    slug: "daejeon",
+    name: "대전",
+    area: "대전 유성구·서구",
+    sido: "대전",
+    districts: [{ code: "30200" }, { code: "30170" }],
+    dongs: ["도룡동", "둔산동"],
+  },
+  { slug: "suseong", name: "수성", area: "대구 수성구", sido: "대구", districts: [{ code: "27260" }], dongs: ["범어동", "만촌동", "황금동", "수성동1가", "수성동2가", "수성동3가", "수성동4가"] },
+  { slug: "haeundae", name: "해운대", area: "부산 해운대구", sido: "부산", districts: [{ code: "26350" }], dongs: ["우동", "중동", "좌동", "재송동"] },
 ];
 
 /**

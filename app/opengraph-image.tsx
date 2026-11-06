@@ -6,7 +6,7 @@ import { cardFonts } from "@/lib/og/fonts";
 import { getLatestEdition } from "@/lib/queries";
 import { TIERS } from "@/lib/stats/tiers";
 
-export const alt = "급지.gg — 수도권 대장아파트 티어";
+export const alt = "급지.gg — 대장아파트 티어";
 export const size = CARD_SIZE;
 export const contentType = "image/png";
 
@@ -19,7 +19,7 @@ export default async function Image() {
   const top = ranked.slice(0, 3);
   const lead = top[0]?.standing?.tier.id ?? "challenger";
   const right = edition ? `${formatKoreanDate(edition.asOf)} 실거래 기준` : "";
-  const title = "수도권 대장아파트 티어";
+  const title = "대장아파트 티어";
   const rows = top.map((s) => ({
     rank: String(s.standing!.rank),
     name: s.leader?.name ?? s.regionSlug,
