@@ -21,7 +21,7 @@ describe("romanDivision", () => {
 
 describe("formatTier", () => {
   it("names a divided tier with its division", () => {
-    expect(formatTier(standing(1.8655))).toBe("다이아몬드 II");
+    expect(formatTier(standing(2.22))).toBe("다이아몬드 II");
   });
 
   it("names an apex tier alone", () => {
@@ -39,18 +39,18 @@ describe("formatGeupji", () => {
 
 describe("formatLp", () => {
   it("groups thousands", () => {
-    expect(formatLp(top())).toBe("1,610 LP");
-    expect(formatLp(standing(1.8655))).toBe("34 LP");
+    expect(formatLp(top())).toBe("2,286 LP");
+    expect(formatLp(standing(2.22))).toBe("39 LP");
   });
 });
 
 describe("formatClimb", () => {
   it("says how far the next division is", () => {
-    expect(formatClimb(standing(1.8655))).toBe("다이아몬드 I까지 1억 1,457만");
+    expect(formatClimb(standing(2.22))).toBe("다이아몬드 I까지 6,427만");
   });
 
   it("names the next tier from division I", () => {
-    expect(formatClimb(standing(1.75))).toBe("마스터까지 9,285만");
+    expect(formatClimb(standing(2.13))).toBe("마스터까지 4,486만");
   });
 
   it("names the seat above for grandmaster", () => {

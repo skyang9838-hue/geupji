@@ -74,15 +74,16 @@ export default async function AboutPage() {
             <div>
               <dt>챌린저·그랜드마스터</dt>
               <dd>
-                롤처럼 자리가 정해져 있어요. 챌린저는 1위 한 자리, 그랜드마스터는 그다음 두 자리예요. 둘 다 1.7급지
-                이내일 때만 앉아요. 값이 되어도 자리가 차 있으면 마스터에 머물러요.
+                챌린저는 강남 3구(강남·서초·송파) 지역이에요. 가격과 상관없이 늘 챌린저예요. 그랜드마스터는 그 밖의
+                지역 중 가격 순서로 두 자리이고, 2.1급지 이내일 때만 앉아요. 값이 되어도 자리가 차 있으면 마스터에
+                머물러요. 순위는 티어가 먼저, 같은 티어 안에서는 가격 순이에요.
               </dd>
             </div>
             <div>
               <dt>디비전과 LP</dt>
               <dd>
                 아이언~다이아몬드는 급지 구간을 넷으로 나눠 IV → I 디비전을 매기고, 디비전 안에서 얼마나 올라왔는지를
-                0~99 LP로 보여줘요. 마스터 이상은 디비전이 없고, 1.7급지 가격을 넘는 100만 원마다 1 LP예요.
+                0~99 LP로 보여줘요. 마스터 이상은 디비전이 없고, 2.1급지 가격을 넘는 100만 원마다 1 LP예요.
               </dd>
             </div>
             <div>
@@ -116,7 +117,7 @@ export default async function AboutPage() {
 
 function rule(tier: Tier): string {
   const worst = tier.maxGeupji.toFixed(1);
-  if (tier.id === "challenger") return `1위 한 자리 · ${worst}급지 이내일 때`;
+  if (tier.id === "challenger") return "강남 3구 (강남·서초·송파) · 가격과 상관없이";
   if (tier.id === "grandmaster") return `그다음 두 자리 · ${worst}급지 이내일 때`;
   if (tier.id === "master") return `${worst}급지 이내 · 디비전 없음`;
   const best = TIERS[tier.level - 1].maxGeupji.toFixed(1);

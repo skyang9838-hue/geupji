@@ -165,6 +165,13 @@ export const REGIONS: RegionDef[] = [
   { slug: "jakjeon", name: "작전", area: "인천 계양구", sido: "인천", districts: [{ code: "28245" }], dongs: ["작전동", "서운동"] },
 ];
 
+/** 강남 3구: every region here is challenger, whatever its price (사용자 2026-11-06). */
+export const CHALLENGER_AREAS = ["서울 강남구", "서울 서초구", "서울 송파구"] as const;
+
+export function isGangnam3(region: RegionDef): boolean {
+  return (CHALLENGER_AREAS as readonly string[]).includes(region.area);
+}
+
 export function regionBySlug(slug: string): RegionDef | undefined {
   return REGIONS.find((r) => r.slug === slug);
 }

@@ -5,19 +5,25 @@ import { rankStandings, type Standing } from "./tiers";
  * Rank the edition's regions against each other: today, at every month end
  * of their history (the ladder), and at the close of every year (seasons,
  * the current year's season still running). `anchors` are the Seoul regions
- * that set 급지 1.0; without them every region counts.
+ * that set 급지 1.0; without them every region counts. `challengers` are the
+ * 강남 3구 regions, challenger whatever their price.
  */
-export function rankEdition(facts: RegionFacts[], anchors?: ReadonlySet<string>): RegionSnapshot[] {
+export function rankEdition(
+  facts: RegionFacts[],
+  anchors?: ReadonlySet<string>,
+  challengers?: ReadonlySet<string>,
+): RegionSnapshot[] {
   const anchor = (slug: string) => anchors?.has(slug) ?? false;
+  const challenger = (slug: string) => challengers?.has(slug) ?? false;
   const today = rankStandings(
-    facts.map((f) => ({ key: f.regionSlug, priceManwon: f.rep?.priceManwon ?? null, anchor: anchor(f.regionSlug) })),
+    facts.map((f) => ({ key: f.regionSlug, priceManwon: f.rep?.priceManwon ?? null, anchor: anchor(f.regionSlug), challenger: challenger(f.regionSlug) })),
   );
 
   const months = [...new Set(facts.flatMap((f) => f.history.map((h) => h.ym)))].sort();
   const priceAt = facts.map((f) => new Map(f.history.map((h) => [h.ym, h.priceManwon])));
   const byMonth: Map<string, Standing>[] = months.map((ym) =>
     rankStandings(
-      facts.map((f, i) => ({ key: f.regionSlug, priceManwon: priceAt[i].get(ym) ?? null, anchor: anchor(f.regionSlug) })),
+      facts.map((f, i) => ({ key: f.regionSlug, priceManwon: priceAt[i].get(ym) ?? null, anchor: anchor(f.regionSlug), challenger: challenger(f.regionSlug) })),
     ),
   );
 

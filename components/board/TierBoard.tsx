@@ -73,6 +73,7 @@ export function TierBoard({ snapshots, regions }: { snapshots: RegionSnapshot[];
 
 function rule(tier: Tier): string {
   const worst = tier.maxGeupji.toFixed(1);
+  if (tier.id === "challenger") return "강남 3구";
   if (tier.seats) return `${tier.seats}자리 · ${worst}급지 이내`;
   const best = TIERS[tier.level - 1].maxGeupji.toFixed(1);
   if (tier.id === "iron") return `${best}급지 넘음`;

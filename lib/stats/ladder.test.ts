@@ -21,13 +21,25 @@ describe("rankEdition", () => {
     const [banpo, songdo] = rankEdition([facts("banpo", 50), facts("songdo", 12)], new Set(["banpo"]));
 
     expect(banpo.standing).toMatchObject({ rank: 1, tier: { id: "challenger" }, anchorManwon: 500000 });
-    expect(songdo.standing).toMatchObject({ rank: 2, tier: { id: "silver" } });
+    expect(songdo.standing).toMatchObject({ rank: 2, tier: { id: "gold" } });
+  });
+
+  it("seats every 강남 3구 region as challenger, month by month too", () => {
+    const [banpo, seongsu, jamsil] = rankEdition(
+      [facts("banpo", 58, { "202601": 58 }), facts("seongsu", 46, { "202601": 46 }), facts("jamsil", 35, { "202601": 35 })],
+      new Set(["banpo", "seongsu", "jamsil"]),
+      new Set(["banpo", "jamsil"]),
+    );
+
+    expect([banpo, jamsil].map((r) => r.standing?.tier.id)).toEqual(["challenger", "challenger"]);
+    expect(seongsu.standing).toMatchObject({ rank: 3, tier: { id: "grandmaster" } });
+    expect(jamsil.ladder).toEqual([{ ym: "202601", rank: 2, level: 0 }]);
   });
 
   it("lets every region set the anchor when no Seoul set is given", () => {
     const [, songdo] = rankEdition([facts("banpo", 50), facts("songdo", 12)]);
 
-    expect(songdo.standing).toMatchObject({ anchorManwon: 310000, tier: { id: "platinum" } });
+    expect(songdo.standing).toMatchObject({ anchorManwon: 310000, tier: { id: "emerald" } });
   });
 
   it("records every month's rank and tier", () => {

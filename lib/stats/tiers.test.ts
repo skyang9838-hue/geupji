@@ -4,12 +4,13 @@ import { anchorPrice, bandTier, geupji, priceAtGeupji, rankStandings, TIERS } fr
 const EOK = 10000; // 1억 = 10,000만원
 const ANCHOR = 50 * EOK;
 
-const standings = (prices: Record<string, number | null>, anchors: string[] = []) =>
+const standings = (prices: Record<string, number | null>, anchors: string[] = [], challengers: string[] = []) =>
   rankStandings(
     Object.entries(prices).map(([key, eok]) => ({
       key,
       priceManwon: eok === null ? null : Math.round(eok * EOK),
       anchor: anchors.includes(key),
+      challenger: challengers.includes(key),
     })),
   );
 
@@ -78,12 +79,12 @@ describe("anchorPrice", () => {
 
 describe("bandTier", () => {
   it("counts a 급지 exactly on a bound as the better tier", () => {
-    expect(bandTier(1.7).id).toBe("master");
-    expect(bandTier(1.71).id).toBe("diamond");
+    expect(bandTier(2.1).id).toBe("master");
+    expect(bandTier(2.11).id).toBe("diamond");
   });
 
-  it("places 급지 by bound: 2.1 diamond, 2.4 emerald, 2.8 platinum, 3.2 gold, 3.6 silver, 4.0 bronze", () => {
-    expect([2.1, 2.4, 2.8, 3.2, 3.6, 4.0, 4.01].map((g) => bandTier(g).id)).toEqual([
+  it("places 급지 by bound: 2.4 diamond, 2.8 emerald, 3.2 platinum, 3.6 gold, 4.0 silver, 4.4 bronze", () => {
+    expect([2.4, 2.8, 3.2, 3.6, 4.0, 4.4, 4.41].map((g) => bandTier(g).id)).toEqual([
       "diamond",
       "emerald",
       "platinum",
@@ -120,7 +121,7 @@ describe("rankStandings", () => {
   it("measures 급지 against the anchors only", () => {
     const s = standings({ banpo: 50, songdo: 12 }, ["banpo"]);
 
-    expect(s.get("songdo")).toMatchObject({ tier: { id: "silver" }, anchorManwon: ANCHOR });
+    expect(s.get("songdo")).toMatchObject({ tier: { id: "gold" }, anchorManwon: ANCHOR });
     expect(s.get("songdo")!.geupji).toBeCloseTo(1 + 1.8 * Math.log(50 / 12), 10);
   });
 
@@ -134,7 +135,7 @@ describe("rankStandings", () => {
     }
   });
 
-  it("seats one challenger and two grandmasters inside 1.7급지; the rest there stay master", () => {
+  it("with no 강남 3구 flagged, seats one challenger and two grandmasters inside 2.1급지; the rest there stay master", () => {
     const s = standings({ a: 50, b: 45, c: 42, d: 40 });
 
     expect(["a", "b", "c", "d"].map((k) => s.get(k)?.tier.id)).toEqual([
@@ -145,36 +146,36 @@ describe("rankStandings", () => {
     ]);
   });
 
-  it("keeps a grandmaster seat empty rather than seat a region past 1.7급지", () => {
-    expect(standings({ banpo: 50, songdo: 12 }, ["banpo"]).get("songdo")?.tier.id).toBe("silver");
-    expect(alone(1.71).tier.id).toBe("diamond");
+  it("keeps a grandmaster seat empty rather than seat a region past 2.1급지", () => {
+    expect(standings({ banpo: 50, songdo: 12 }, ["banpo"]).get("songdo")?.tier.id).toBe("gold");
+    expect(alone(2.11).tier.id).toBe("diamond");
   });
 
   it("splits a tier into divisions IV–I and counts LP inside the division", () => {
-    // diamond 1.7–2.1급지 in 0.1 steps: 1.8655 sits in II, 34% of the way to I
-    expect(alone(1.8655)).toMatchObject({ tier: { id: "diamond" }, division: 2, lp: 34 });
+    // diamond 2.1–2.4급지 in 0.075 steps: 2.22 sits in II, 40% of the way to I
+    expect(alone(2.22)).toMatchObject({ tier: { id: "diamond" }, division: 2, lp: 39 });
   });
 
   it("starts a tier at division IV with 0 LP", () => {
-    expect(alone(2.0999)).toMatchObject({ tier: { id: "diamond" }, division: 4, lp: 0 });
+    expect(alone(2.3999)).toMatchObject({ tier: { id: "diamond" }, division: 4, lp: 0 });
   });
 
-  it("puts anything past 4.4급지 at Iron IV, 0 LP", () => {
-    expect(alone(5)).toMatchObject({ tier: { id: "iron" }, division: 4, lp: 0 });
+  it("puts anything past 4.8급지 at Iron IV, 0 LP", () => {
+    expect(alone(5.2)).toMatchObject({ tier: { id: "iron" }, division: 4, lp: 0 });
   });
 
   it("gives apex tiers no division and one LP per 100만원 over master's floor", () => {
-    expect(rankStandings([{ key: "a", priceManwon: ANCHOR }]).get("a")).toMatchObject({ division: null, lp: 1610 });
-    expect(alone(1.5)).toMatchObject({ tier: { id: "grandmaster" }, division: null, lp: 398 });
+    expect(rankStandings([{ key: "a", priceManwon: ANCHOR }]).get("a")).toMatchObject({ division: null, lp: 2286 });
+    expect(alone(1.5)).toMatchObject({ tier: { id: "grandmaster" }, division: null, lp: 1073 });
   });
 
   it("measures the climb to the next division floor", () => {
-    // Diamond II → Diamond I at 1.8급지
-    expect(alone(1.8655).toNext).toBe(11457);
+    // Diamond II → Diamond I at 2.175급지
+    expect(alone(2.22).toNext).toBe(6427);
   });
 
   it("measures division I's climb to the next tier's floor", () => {
-    expect(alone(1.75).toNext).toBe(9285);
+    expect(alone(2.13).toNext).toBe(4486);
   });
 
   it("measures master's climb to the lowest grandmaster", () => {
@@ -187,5 +188,41 @@ describe("rankStandings", () => {
 
   it("has nothing left to climb for the challenger", () => {
     expect(standings({ banpo: 53.9 }).get("banpo")?.toNext).toBeNull();
+  });
+});
+
+describe("rankStandings with 강남 3구", () => {
+  // 2026-09 real prices: 성수 sits above 대치·개포·잠실 by price
+  const PRICES = { banpo: 58.5, seongsu: 46.5, daechi: 43.45, gaepo: 37.1, jamsil: 34.9, gangdong: 30, yongsan: 28 };
+  const SEOUL = Object.keys(PRICES);
+  const G3 = ["banpo", "daechi", "gaepo", "jamsil"];
+  const s = () => standings(PRICES, SEOUL, G3);
+
+  it("makes every 강남 3구 region challenger, whatever its price", () => {
+    expect(G3.map((k) => s().get(k)?.tier.id)).toEqual(["challenger", "challenger", "challenger", "challenger"]);
+  });
+
+  it("keeps a 강남 3구 region challenger even far down the ladder", () => {
+    expect(standings({ banpo: 50, jamsil: 10 }, ["banpo"], ["banpo", "jamsil"]).get("jamsil")?.tier.id).toBe("challenger");
+  });
+
+  it("never seats a region outside 강남 3구 as challenger; the next two by price take grandmaster", () => {
+    expect(["seongsu", "gangdong", "yongsan"].map((k) => s().get(k)?.tier.id)).toEqual(["grandmaster", "grandmaster", "master"]);
+  });
+
+  it("ranks by tier first, then price", () => {
+    expect(["banpo", "daechi", "gaepo", "jamsil", "seongsu", "gangdong", "yongsan"].map((k) => s().get(k)?.rank)).toEqual([
+      1, 2, 3, 4, 5, 6, 7,
+    ]);
+  });
+
+  it("has a grandmaster climb to the grandmaster above, and nothing for the top one", () => {
+    expect(s().get("seongsu")?.toNext).toBeNull();
+    expect(s().get("gangdong")?.toNext).toBe(465000 - 300000);
+    expect(s().get("yongsan")?.toNext).toBe(300000 - 280000);
+  });
+
+  it("has nothing to climb for any challenger", () => {
+    expect(G3.map((k) => s().get(k)?.toNext)).toEqual([null, null, null, null]);
   });
 });

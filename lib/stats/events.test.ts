@@ -28,7 +28,7 @@ const snap = (regionSlug: string, priceManwon: number | null): RegionSnapshot =>
   high: null,
   contenders: [],
   history: [],
-  // measured against a lone 50억 anchor: diamond from 27.1억, emerald from 23억
+  // measured against a lone 50억 anchor: diamond from 23억, emerald from 18.4억
   standing:
     priceManwon === null
       ? null
@@ -44,22 +44,22 @@ const leader = { aptSeq: "11710-1", name: "잠실엘스" };
 
 describe("tierEvents", () => {
   it("reports a promotion when the tier level falls (emerald → diamond)", () => {
-    const events = tierEvents(new Map([["jamsil", 4]]), [snap("jamsil", 280000)]);
+    const events = tierEvents(new Map([["jamsil", 4]]), [snap("jamsil", 250000)]);
 
     expect(events).toEqual([
-      { type: "TIER_UP", regionSlug: "jamsil", fromLevel: 4, toLevel: 3, priceManwon: 280000 },
+      { type: "TIER_UP", regionSlug: "jamsil", fromLevel: 4, toLevel: 3, priceManwon: 250000 },
     ]);
   });
 
   it("reports a demotion when the tier level rises (diamond → emerald)", () => {
-    const events = tierEvents(new Map([["jamsil", 3]]), [snap("jamsil", 260000)]);
+    const events = tierEvents(new Map([["jamsil", 3]]), [snap("jamsil", 200000)]);
 
     expect(events[0]).toMatchObject({ type: "TIER_DOWN", fromLevel: 3, toLevel: 4 });
   });
 
   it("stays quiet for an unchanged tier, a new region, or a region that lost its price", () => {
     const events = tierEvents(new Map([["jamsil", 3], ["mapo", 3]]), [
-      snap("jamsil", 280000),
+      snap("jamsil", 250000),
       snap("mapo", null),
       snap("songdo", 100000),
     ]);
