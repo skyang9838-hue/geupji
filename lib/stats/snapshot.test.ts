@@ -150,6 +150,81 @@ describe("buildRegionSnapshot", () => {
     expect(snap.history.at(-1)).toMatchObject({ priceManwon: 200000 });
   });
 
+  describe("a sticky leader in the history", () => {
+    // one 84㎡ deal on the 10th of every month in 2014–2015, priced by month
+    const monthly = (aptSeq: string, name: string, price: (ym: string) => number | null) => {
+      const trades: StatTrade[] = [];
+      for (const y of [2014, 2015])
+        for (let m = 1; m <= 12; m++) {
+          const ym = `${y}${String(m).padStart(2, "0")}`;
+          const p = price(ym);
+          if (p !== null) trades.push(t(`${y}-${String(m).padStart(2, "0")}-10`, p));
+        }
+      return complex(aptSeq, name, trades, 2010);
+    };
+    const leaderIn = (snap: ReturnType<typeof buildRegionSnapshot>, ym: string) =>
+      snap.history.find((h) => h.ym === ym)?.leaderName ?? "(오늘 대장)";
+
+    it("keeps the sitting leader when a rival is pricier by less than the margin", () => {
+      const sitting = monthly("1", "터줏대감", () => 100000);
+      const rival = monthly("2", "도전자", (ym) => (ym >= "201501" ? 104000 : 90000));
+      const today = complex("9", "오늘대장", [t("2026-09-01", 300000), t("2026-09-10", 300000), t("2026-09-20", 300000)]);
+
+      const snap = buildRegionSnapshot(region, [sitting, rival, today], AS_OF);
+
+      expect(leaderIn(snap, "201512")).toBe("터줏대감");
+    });
+
+    it("hands over only after the rival leads by the margin for three month ends in a row", () => {
+      const sitting = monthly("1", "터줏대감", () => 100000);
+      // 120 from 2015-03; median of the 90-day window crosses 105 at the April month end
+      const rival = monthly("2", "도전자", (ym) => (ym >= "201503" ? 120000 : 90000));
+      const today = complex("9", "오늘대장", [t("2026-09-01", 300000), t("2026-09-10", 300000), t("2026-09-20", 300000)]);
+
+      const snap = buildRegionSnapshot(region, [sitting, rival, today], AS_OF);
+      const firstRivalMonth = snap.history.find((h) => h.ym >= "201501" && h.leaderName === "도전자")?.ym;
+
+      expect(leaderIn(snap, "201504")).toBe("터줏대감");
+      expect(firstRivalMonth).toBeDefined();
+      expect(firstRivalMonth! >= "201505").toBe(true);
+      expect(leaderIn(snap, "201512")).toBe("도전자");
+    });
+
+    it("lets a back-and-forth rival never take the seat", () => {
+      const sitting = monthly("1", "터줏대감", () => 100000);
+      // shows up once the sitting leader holds the seat; its 90-day median swings 130 ↔ 80 month to month
+      const flicker = monthly("2", "들쭉날쭉", (ym) => (ym < "201406" ? null : Number(ym.slice(4)) % 2 ? 130000 : 80000));
+
+      const today = complex("9", "오늘대장", [t("2026-09-01", 300000), t("2026-09-10", 300000), t("2026-09-20", 300000)]);
+
+      const snap = buildRegionSnapshot(region, [sitting, flicker, today], AS_OF);
+      const names = new Set(snap.history.filter((h) => h.ym >= "201406" && h.ym <= "201512").map((h) => h.leaderName ?? "(오늘 대장)"));
+
+      expect(names).toEqual(new Set(["터줏대감"]));
+    });
+
+    it("carries the sitting leader through a thin month instead of dipping to a cheaper complex", () => {
+      // no deals Jun–Dec 2015: its 90/180-day windows run dry but it traded within the year
+      const sitting = monthly("1", "터줏대감", (ym) => (ym >= "201506" ? null : 100000));
+      const cheaper = monthly("2", "싼단지", () => 70000);
+      const today = complex("9", "오늘대장", [t("2026-09-01", 300000), t("2026-09-10", 300000), t("2026-09-20", 300000)]);
+
+      const snap = buildRegionSnapshot(region, [sitting, cheaper, today], AS_OF);
+
+      expect(snap.history.find((h) => h.ym === "201510")).toMatchObject({ leaderName: "터줏대감", priceManwon: 100000 });
+    });
+
+    it("gives up the seat once the leader has not traded for a year", () => {
+      const sitting = monthly("1", "터줏대감", (ym) => (ym >= "201501" ? null : 100000));
+      const cheaper = monthly("2", "싼단지", () => 70000);
+      const today = complex("9", "오늘대장", [t("2026-09-01", 300000), t("2026-09-10", 300000), t("2026-09-20", 300000)]);
+
+      const snap = buildRegionSnapshot(region, [sitting, cheaper, today], AS_OF);
+
+      expect(leaderIn(snap, "201512")).toBe("싼단지");
+    });
+  });
+
   it("leaves an empty region without a leader, price or history", () => {
     const snap = buildRegionSnapshot(region, [], AS_OF);
 

@@ -32,6 +32,10 @@ export interface RegionDef {
 // - 화성시(41590) split into 4 구 on 2026-02-01; 동탄 is 동탄구 41597.
 //   Its 오산동 was renamed 여울동 at the same time (the 동탄역 area).
 // - 인천 서구(28260) was abolished on 2026-07-01: 청라 → 서해구 28275, 검단 → 검단구 28290.
+// - After a split MOLIT answers the abolished code with 0 rows for every month and serves
+//   the old months under the new code (checked 2026-11-09: 41590/202301 = 0, 41597/202301 = 294,
+//   41597/201201 = 74; 28260/202301 = 0, 28275 = 215, 28290 = 108). So these regions use only
+//   the new code for all months. aptSeq keeps the old prefix (e.g. 41590-2074).
 export const REGIONS: RegionDef[] = [
   // ── 서울 ───────────────────────────────────────────
   { slug: "banpo", name: "반포", area: "서울 서초구", sido: "서울", districts: [{ code: "11650" }], dongs: ["반포동", "잠원동"] },
@@ -107,8 +111,7 @@ export const REGIONS: RegionDef[] = [
     area: "화성 동탄구",
     sido: "경기",
     districts: [
-      { code: "41590", to: "202601" },
-      { code: "41597", from: "202602" },
+      { code: "41597" },
     ],
     dongs: [
       "여울동",
@@ -186,8 +189,7 @@ export const REGIONS: RegionDef[] = [
     area: "인천 서해구",
     sido: "인천",
     districts: [
-      { code: "28260", to: "202606" },
-      { code: "28275", from: "202607" },
+      { code: "28275" },
     ],
     dongs: ["청라동", "경서동", "연희동"],
   },
@@ -197,8 +199,7 @@ export const REGIONS: RegionDef[] = [
     area: "인천 검단구",
     sido: "인천",
     districts: [
-      { code: "28260", to: "202606" },
-      { code: "28290", from: "202607" },
+      { code: "28290" },
     ],
     dongs: ["당하동", "원당동", "마전동", "불로동", "오류동", "왕길동", "백석동"],
   },

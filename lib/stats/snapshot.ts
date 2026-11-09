@@ -146,12 +146,24 @@ function canLeadOnItsOwn(complex: ComplexHistory, asOf: string, band: SizeBand):
   return deals.length >= AUTO_LEADER_MIN_DEALS;
 }
 
+/** A challenger must top the sitting leader by this much … */
+export const LEADER_SWITCH_MARGIN = 0.05;
+/** … for this many month ends in a row before it takes over. */
+export const LEADER_SWITCH_MONTHS = 3;
+
 /**
  * The region's price at every month end from January 2006, the as-of day closing
  * the last month. Each month is priced by whoever led then: the configured
  * leader once it trades, otherwise the same auto rule as today, judged at that
  * month (younger than 30 then, three deals in the year before). Long-run 급지
  * stays "the region's top complex", not one building's price before it existed.
+ *
+ * The auto leader is sticky (사용자 2026-11-09: "너무 많이 바뀌어도 안 된다"):
+ * it keeps the seat while it still traded in the past year and is under 30, even
+ * in a thin month (its last representative price carries, so the line doesn't dip
+ * to a cheaper complex for a month). A challenger takes over only after leading
+ * by LEADER_SWITCH_MARGIN for LEADER_SWITCH_MONTHS month ends in a row. With no
+ * sitting leader the priciest eligible complex takes the seat at once.
  */
 function leaderHistory(
   complexes: ComplexHistory[],
@@ -164,21 +176,57 @@ function leaderHistory(
   const qualifying = complexes
     .map((c) => ({ c, trades: c.trades.filter((t) => isQualifying(t, band)) }))
     .filter((q) => q.trades.length > 0);
+  let seat: ComplexHistory | null = null;
+  let challenger: ComplexHistory | null = null;
+  let streak = 0;
   return monthsBetween(HISTORY_FROM, endYm).map((ym) => {
     const day = ym === endYm ? asOf : monthEnd(ym);
     const since = shiftDate(day, -365);
-    const live = qualifying
-      .filter((q) => q.trades.some((t) => t.dealDate > since && t.dealDate <= day))
+    const recent = qualifying.filter((q) => q.trades.some((t) => t.dealDate > since && t.dealDate <= day));
+    const priced = recent
       .map((q) => ({ c: q.c, rep: representativePrice(q.trades, day, band) }))
-      .filter((p): p is { c: ComplexHistory; rep: RepresentativePrice } => p.rep !== null && !p.rep.stale)
-      .sort((a, b) => b.rep.priceManwon - a.rep.priceManwon);
-    const lead =
-      live.find((p) => p.c === configured) ?? live.find((p) => canLeadOnItsOwn(p.c, day, band)) ?? live[0];
+      .filter((p): p is { c: ComplexHistory; rep: RepresentativePrice } => p.rep !== null);
+    const live = priced.filter((p) => !p.rep.stale).sort((a, b) => b.rep.priceManwon - a.rep.priceManwon);
+
+    let lead = live.find((p) => p.c === configured);
+    if (lead) {
+      seat = lead.c;
+      challenger = null;
+      streak = 0;
+    } else {
+      const best = live.find((p) => canLeadOnItsOwn(p.c, day, band)) ?? live[0];
+      const held = seat && canHold(seat, day) ? priced.find((p) => p.c === seat) : undefined;
+      if (!held) {
+        lead = best;
+        seat = best?.c ?? null;
+        challenger = null;
+        streak = 0;
+      } else if (best && best.c !== held.c && best.rep.priceManwon > held.rep.priceManwon * (1 + LEADER_SWITCH_MARGIN)) {
+        streak = challenger === best.c ? streak + 1 : 1;
+        challenger = best.c;
+        if (streak >= LEADER_SWITCH_MONTHS) {
+          lead = best;
+          seat = best.c;
+          challenger = null;
+          streak = 0;
+        } else lead = held;
+      } else {
+        lead = held;
+        challenger = null;
+        streak = 0;
+      }
+    }
     if (!lead) return { ym, priceManwon: null };
     return lead.c === today
       ? { ym, priceManwon: lead.rep.priceManwon }
       : { ym, priceManwon: lead.rep.priceManwon, leaderName: lead.c.name };
   });
+}
+
+/** A sitting auto leader keeps its seat while it is under 30 at that month. Recent trading is checked by the caller. */
+function canHold(complex: ComplexHistory, day: string): boolean {
+  const age = complex.buildYear === null ? 0 : Number(day.slice(0, 4)) - complex.buildYear;
+  return age < AUTO_LEADER_MAX_AGE;
 }
 
 function monthEnd(ym: string): string {
