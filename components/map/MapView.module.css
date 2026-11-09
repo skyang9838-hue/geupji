@@ -1,0 +1,219 @@
+.wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 16px;
+  align-items: start;
+}
+
+.mapCol {
+  min-width: 0;
+}
+
+.jumps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.jumps button {
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--text-2);
+  font-size: 15px;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.jumps button:hover {
+  color: var(--text);
+}
+
+.jumps button[aria-pressed="true"] {
+  background: var(--panel-3);
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* Leaflet 판(z-index 400~1000)이 고정 상단바 위로 올라오지 않게 가둔다 */
+.map {
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
+  height: min(72vh, 720px);
+  min-height: 420px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--panel);
+}
+
+.leaflet,
+.loading {
+  width: 100%;
+  height: 100%;
+}
+
+.loading {
+  display: grid;
+  place-items: center;
+  color: var(--text-3);
+}
+
+.leaflet:global(.leaflet-container) {
+  background: #0e0e10;
+  font-family: var(--font-ui);
+}
+
+/* 밝은 OSM 타일을 다크 쇼룸에 맞게: 뒤집고 색을 빼 회색 바탕으로 */
+.leaflet :global(.leaflet-tile-pane) {
+  filter: invert(1) hue-rotate(180deg) saturate(0.15) brightness(0.75) contrast(1.1);
+}
+
+.leaflet :global(.leaflet-control-attribution) {
+  background: rgba(0, 0, 0, 0.6);
+  color: var(--text-3);
+  font-size: 11px;
+}
+
+.leaflet :global(.leaflet-control-attribution a) {
+  color: var(--text-2);
+}
+
+.leaflet :global(.leaflet-bar) {
+  border: 0;
+  box-shadow: none;
+}
+
+.leaflet :global(.leaflet-bar a) {
+  background: var(--panel-2);
+  color: var(--text);
+  border-bottom-color: var(--line-2);
+}
+
+.leaflet :global(.leaflet-bar a:hover) {
+  background: var(--panel-3);
+}
+
+/* 지역 이름: 멀리서는 숨기고 LABEL_ZOOM부터 보인다 */
+.leaflet :global(.leaflet-tooltip).regionLabel {
+  display: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  text-shadow: 0 0 3px #000, 0 0 6px #000;
+  white-space: nowrap;
+}
+
+.leaflet :global(.leaflet-tooltip).regionLabel::before {
+  display: none;
+}
+
+.leaflet.showLabels :global(.leaflet-tooltip).regionLabel {
+  display: block;
+}
+
+.card {
+  min-height: 200px;
+  padding: 22px;
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.hint {
+  color: var(--text-3);
+  font-size: 16px;
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.area {
+  font-size: 15px;
+  color: var(--text-3);
+}
+
+.name {
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.tier {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 18px;
+  color: var(--text-2);
+}
+
+.tierName {
+  color: var(--c);
+  font-weight: 600;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.facts div {
+  min-width: 0;
+}
+
+.facts .wide {
+  grid-column: 1 / -1;
+}
+
+.facts dt {
+  font-size: 14px;
+  color: var(--text-3);
+}
+
+.facts dd {
+  margin-top: 2px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.facts dd :global(.num) {
+  font-size: 24px;
+}
+
+.link {
+  align-self: flex-start;
+  color: var(--link);
+  font-size: 16px;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 900px) {
+  .wrap {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .map {
+    height: 62vh;
+    min-height: 360px;
+  }
+  .card {
+    min-height: 0;
+  }
+}

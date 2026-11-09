@@ -5,6 +5,7 @@ import styles from "./TopBar.module.css";
 
 const NAV = [
   { href: "/", label: "랭킹", key: "ranking" },
+  { href: "/map", label: "지도", key: "map" },
   { href: "/compare", label: "비교", key: "compare" },
   { href: "/my", label: "내 아파트", key: "my" },
   { href: "/about", label: "기준", key: "about" },

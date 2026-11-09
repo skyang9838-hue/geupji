@@ -52,9 +52,17 @@
 .nav {
   display: flex;
   gap: 2px;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.nav::-webkit-scrollbar {
+  display: none;
 }
 
 .nav a {
+  flex: none;
   padding: 5px 14px;
   border-radius: 999px;
   font-size: 16px;
@@ -86,6 +94,16 @@
     display: none;
   }
   .nav a {
-    padding: 5px 12px;
+    padding: 5px 9px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 400px) {
+  .inner {
+    gap: 10px;
+  }
+  .nav a {
+    padding: 5px 7px;
   }
 }

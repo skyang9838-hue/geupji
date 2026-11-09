@@ -1,0 +1,98 @@
+.head {
+  padding: 64px 0 28px;
+}
+
+.title {
+  font-size: clamp(36px, 5vw, 56px);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+}
+
+.lede {
+  margin-top: 12px;
+  font-size: 19px;
+  line-height: 1.45;
+  color: var(--text-2);
+}
+
+.legendWrap {
+  margin: 28px 0 80px;
+}
+
+.legendTitle {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.legend {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+  list-style: none;
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--panel);
+}
+
+.swatch {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  background: var(--c);
+}
+
+.tierName {
+  min-width: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.count {
+  margin-left: auto;
+  font-size: 15px;
+  color: var(--text-3);
+}
+
+.note {
+  margin-top: 16px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text-3);
+}
+
+.note a {
+  color: var(--link);
+}
+
+@media (max-width: 900px) {
+  .legend {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .legend li {
+    gap: 6px;
+    padding: 10px;
+  }
+  .tierName {
+    font-size: 15px;
+  }
+  .head {
+    padding: 40px 0 20px;
+  }
+  .lede {
+    font-size: 17px;
+  }
+}
